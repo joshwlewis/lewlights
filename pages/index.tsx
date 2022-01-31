@@ -1,32 +1,34 @@
 import type { NextPage } from "next";
-import Head from "next/head";
 
-const Home: NextPage = () => {
+const Index: NextPage = () => {
   return (
-    <div className="h-screen gradient">
-      <div className="h-screen dots bg-blend-multiply">
-        <Head>
-          <title>LewLights - Lakeland TN Holiday Light Show</title>
-          <meta
-            name="description"
-            content="LewLights is an animated, synchronized Holiday Light Show in Lakeland, TN."
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <main className="container mx-auto">
-          <h1 className="text-2xl font-bold">LewLights</h1>
-          <svg width="24" height="24">
-            <path
-              d="M 0 0 L 0 24 L 24 24 L 24 0 L 0 0
-                     M 6, 12
-                     a 6 6 0 1 1  12 0
-                     a 6 6 0 1 1 -12 0 Z"
-            ></path>
-          </svg>
-        </main>
+    <>
+      <div className="text-gray-200 text-center">
+        <h2 className="text-xl mb-2">
+          Our lights are <b>off</b>.
+        </h2>
+        <h2 className="text-lg">
+          The lights will glow again in November 2022.
+          We hope to see you then.
+        </h2>
       </div>
-    </div>
-  );
+      <div className="flex justify-center items-center my-8">
+        <div className="w-3/4 md:w-2/3 lg:w-1/2">
+          <video autoPlay loop muted className=''>
+            <source
+              src='lewlights-hero.mp4'
+              type='video/mp4'
+            />
+          </video>
+        </div>
+      </div>
+      <div className="text-gray-200 text-center my-6">
+        <h4 className="text-xl mb-2">
+          Have a great year!
+        </h4>
+      </div>
+    </>
+    );
 };
 
-export default Home;
+export default Index;

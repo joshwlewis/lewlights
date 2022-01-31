@@ -2,16 +2,54 @@
 @tailwind components;
 
 .gradient {
-  background-image: linear-gradient(70deg, 
-    rgb(190, 24, 93),
-    rgb(15, 118, 110),
-    rgb(67, 56, 202)
+  background: linear-gradient(70deg, 
+    #D946EF,
+    #F43F5E,
+    #F97316,
+    #EAB308,
+    #22C55E,
+    #14B8A6,
+    #0EA5E9,
+    #6366F1,
+    #A855F7
   )
 }
-.dots {
-  /* background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E"); */
-  /* background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h16v2h-6v6h6v8H8v-6H2v6H0V0zm4 4h2v2H4V4zm8 8h2v2h-2v-2zm-8 0h2v2H4v-2zm8-8h2v2h-2V4z' fill='%23000' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E"); */
 
+.text-gradient {
+  background: linear-gradient(120deg,
+    #A855F7,
+    #6366F1,
+    #0EA5E9,
+    #14B8A6,
+    #22C55E,
+    #EAB308,
+    #F97316,
+    #F43F5E,
+    #D946EF
+  );
+  color: transparent;
+  background-clip: text;
+}
+
+.backlit {
+  box-shadow: 
+    0px 8px 12px -4px rgba(255,255,255,.2),
+    0px -8px 12px -4px rgba(255,255,255,.2),
+    -4px 0px 12px -4px rgba(255,255,255,.2),
+    4px 0px 12px -4px rgba(255,255,255,.2)
+}
+
+.dots {
+  background-image: url("data:image/svg+xml, \
+    %3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E \
+      %3Cpath \
+        fill='%23000' \
+        fill-opacity='0.90' \
+        fill-rule='evenodd' \
+        d='M 0 0 L 0 24 L 24 24 L 24 0 L 0 0 M 6 12 a 4 4 0 1 1 10 0 a 4 4 0 1 1 -10 0 Z' \
+      %3E%3C/path%3E \
+    %3C/svg%3E"
+  );
 }
 
 @tailwind utilities;
