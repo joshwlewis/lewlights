@@ -1,8 +1,20 @@
 @tailwind base;
 @tailwind components;
 
-.gradient {
-  background: linear-gradient(70deg, 
+.h-fade {
+  background:
+    linear-gradient(#111827, transparent 8%),
+    /* radial-gradient(ellipse closest-corner at 50% 10%, #111827 50%, transparent) */
+    linear-gradient(transparent 92%, #111827)
+}
+
+.edge-fade {
+  background: radial-gradient(ellipse farthest-corner, #111827 98%, transparent);
+  box-shadow: 0 0 16px 8px #111827;
+}
+
+.color-gradient {
+  background: linear-gradient(70deg,
     #D946EF,
     #F43F5E,
     #F97316,

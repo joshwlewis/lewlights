@@ -19,16 +19,15 @@ export default function Layout({children}) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="h-screen gradient">
-        <div className="h-screen dots bg-blend-multiply">
-          <header className="bg-gray-900 backlit">
-            <div className="container flex flex-wrap items-center justify-center gap-x-12 gap-y-4 mx-auto p-4 mb-14">
+        <div className="bg-gray-900 min-h-screen">
+          <header className="bg-gray-900 ">
+            <div className="container flex flex-wrap items-center justify-center gap-x-12 gap-y-4 mx-auto px-12 py-3">
               <div className="sm:text-center">
                 <h3 className="text-2xl font-bold text-gradient">
                   LewLights
                 </h3>
               </div>
-              <div className="grow flex justify-between gap-2 text-gray-300">
+              <div className="grow flex justify-between gap-2 text-gray-400">
                 {Object.keys(pages).map((page) => {
                   return (
                     <>
@@ -39,10 +38,20 @@ export default function Layout({children}) {
               </div>
             </div>
           </header>
-          <main className="container mx-auto p-6 bg-gray-900 backlit rounded-xl">
-            { children }
-          </main>
+        <div className="color-gradient">
+          <div className="dots bg-blend-multiply">
+            <div className="h-fade h-full py-14">
+              <div className="container mx-auto">
+                <main className="mx-6 p-6 rounded-lg edge-fade">
+                  { children }
+                </main>
+              </div>
+            </div>
+          </div>
         </div>
+        <footer className="bg-gray-900 text-gray-400 text-center p-6">
+          <address>10480 Mt McKenzie Rd, Lakeland TN, 38002</address>
+        </footer>
       </div>
     </>
   )
