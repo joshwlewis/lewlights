@@ -8,7 +8,7 @@ const pages: Record<string, string> = {
   donations: 'Donations',
 };
 
-export default function Layout({children}) {
+export default function Layout({ children }: React.PropsWithChildren<{}>) {
   return(
     <>
       <Head>
