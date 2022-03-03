@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 const pages: Record<string, string> = {
+  "": 'Home',
   map: 'Map',
   playlist: 'Playlist',
   videos: 'Videos'
@@ -18,22 +19,20 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="bg-gray-900 min-h-screen">
-        <header className="bg-gray-900 ">
-          <div className="container flex flex-wrap items-center justify-center gap-x-12 gap-y-4 mx-auto px-12 py-3">
+      <div className="bg-black min-h-screen">
+        <header className="bg-black">
+          <div className="container flex flex-wrap items-center justify-center gap-x-8 gap-y-4 mx-auto px-12 py-3">
             <div className="sm:text-center">
               <h3 className="text-2xl font-bold text-gradient">
                 <Link href="/">•••lewlights•••</Link>
               </h3>
             </div>
-            <div className="grow flex justify-between gap-2 text-gray-400">
+            <div className="sm:ml-auto flex justify-between gap-6 text-gray-400">
               {Object.keys(pages).map((page) => {
                 return (
-                  <>
-                    <Link href={page}>
-                      <a className="hover:text-sky-400">{pages[page]}</a>
-                    </Link>
-                  </>
+                  <Link key={page} href={`/${page}`}>
+                    <a className="hover:text-sky-400">{pages[page]}</a>
+                  </Link>
                 )
               })}
             </div>
@@ -50,7 +49,7 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
             </div>
           </div>
         </div>
-        <footer className="bg-gray-900 text-gray-400 text-center p-6">
+        <footer className="bg-black text-gray-400 text-center p-6">
           <address>10480 Mt McKenzie Rd, Lakeland TN, 38002</address>
         </footer>
       </div>

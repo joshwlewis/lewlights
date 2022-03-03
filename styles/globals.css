@@ -3,14 +3,14 @@
 
 .h-fade {
   background:
-    linear-gradient(#111827, transparent 8%),
+    linear-gradient(#060913, transparent 8%),
     /* radial-gradient(ellipse closest-corner at 50% 10%, #111827 50%, transparent) */
-    linear-gradient(transparent 92%, #111827)
+    linear-gradient(transparent 92%, #060913)
 }
 
 .edge-fade {
-  background: radial-gradient(ellipse farthest-corner, #111827 98%, transparent);
-  box-shadow: 0 0 16px 8px #111827;
+  background: radial-gradient(ellipse farthest-corner, #060913 98%, transparent);
+  box-shadow: 0 0 16px 8px #060913;
 }
 
 .color-gradient {
@@ -56,7 +56,7 @@
     %3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E \
       %3Cpath \
         fill='%23000' \
-        fill-opacity='0.90' \
+        fill-opacity='0.95' \
         fill-rule='evenodd' \
         d='M 0 0 L 0 24 L 24 24 L 24 0 L 0 0 M 6 12 a 4 4 0 1 1 10 0 a 4 4 0 1 1 -10 0 Z' \
       %3E%3C/path%3E \
