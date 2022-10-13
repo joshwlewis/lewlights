@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 const Index: NextPage = () => {
   return (
     <>
-      <div className="text-gray-200 text-center">
+      <div className="text-gray-200">
         <h2 className="text-xl mb-2">
           Our lights are <b>off</b>.
         </h2>
@@ -12,7 +12,7 @@ const Index: NextPage = () => {
           We hope to see you then.
         </h2>
       </div>
-      <div className="flex justify-center items-center my-8">
+      <div className="flex justify-center my-8">
         <div className="w-3/4 md:w-2/3 lg:w-1/2">
           <video autoPlay loop muted className=''>
             <source
@@ -22,7 +22,7 @@ const Index: NextPage = () => {
           </video>
         </div>
       </div>
-      <div className="text-gray-200 text-center my-6">
+      <div className="text-gray-200 my-6">
         <h4 className="text-xl mb-2">
           Have a great year!
         </h4>

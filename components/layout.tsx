@@ -2,10 +2,10 @@ import Head from "next/head";
 import Link from "next/link";
 
 const pages: Record<string, string> = {
-  "": 'Home',
-  map: 'Map',
-  playlist: 'Playlist',
-  videos: 'Videos'
+  "": 'home',
+  map: 'map',
+  playlist: 'playlist',
+  videos: 'videos'
 };
 
 export default function Layout({ children }: React.PropsWithChildren<{}>) {
@@ -19,39 +19,47 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="bg-black min-h-screen">
-        <header className="bg-black">
-          <div className="container flex flex-wrap items-center justify-center gap-x-8 gap-y-4 mx-auto px-12 py-3">
-            <div className="sm:text-center">
-              <h3 className="text-2xl font-bold text-gradient">
-                <Link href="/">•••lewlights•••</Link>
-              </h3>
-            </div>
-            <div className="sm:ml-auto flex justify-between gap-6 text-gray-400">
-              {Object.keys(pages).map((page) => {
-                return (
-                  <Link key={page} href={`/${page}`}>
-                    <a className="hover:text-sky-400">{pages[page]}</a>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        </header>
-        <div className="color-gradient">
-          <div className="dots bg-blend-multiply">
-            <div className="h-fade h-full py-14">
-              <div className="container mx-auto">
-                <main className="mx-6 p-6 rounded-lg edge-fade">
-                  { children }
-                </main>
+      <div className="color-gradient min-h-screen">
+        <div className="dots min-h-screen">
+          <div className="diagonal-wash min-h-screen">
+            <div className="container mx-auto p-6">
+              <header className="">
+                  <div className="flex flex-shrink">
+                  <h3 className="text-3xl my-4 font-bold font-mono text-gradient">
+                    <span>••••</span>
+                    <Link href="/">lewlights</Link>
+                    <span>••••</span>
+                  </h3>
+                  </div>
+                  <div className="flex font-mono text-sm">
+                    <div className="shrink text-gradient">
+                      <div className="flex gap-6">
+                        {Object.keys(pages).map((page) => {
+                          return (
+                            <Link key={page} href={`/${page}`}>
+                              <a className="hover:text-sky-400">
+                                •{pages[page]}•
+                              </a>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+              </header>
+              <div className="h-full py-14">
+                <div className="">
+                  <main className="py-6 rounded-lg">
+                    { children }
+                  </main>
+                </div>
               </div>
+              <footer className="text-gray-400 text-center p-6">
+                <address>10480 Mt McKenzie Rd, Lakeland TN, 38002</address>
+              </footer>
             </div>
           </div>
         </div>
-        <footer className="bg-black text-gray-400 text-center p-6">
-          <address>10480 Mt McKenzie Rd, Lakeland TN, 38002</address>
-        </footer>
       </div>
     </>
   )
