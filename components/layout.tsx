@@ -3,7 +3,8 @@ import Link from "next/link";
 
 const pages: Record<string, string> = {
   "": 'home',
-  map: 'map',
+  "#status": "status",
+  "#map": 'map',
   playlist: 'playlist',
   videos: 'videos'
 };
@@ -22,8 +23,8 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
       <div className="color-gradient min-h-screen">
         <div className="dots min-h-screen">
           <div className="diagonal-wash min-h-screen">
-            <div className="container mx-auto p-6">
-              <header className="">
+            <div className="container mx-auto py-2 px-4 divide-y divide-gray-500">
+              <header className="py-2">
                   <div className="flex flex-shrink">
                   <h3 className="text-3xl my-4 font-bold font-mono text-gradient">
                     <span>••••</span>
@@ -47,7 +48,7 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                     </div>
                   </div>
               </header>
-              <div className="h-full py-14">
+              <div className="h-full py-10">
                 <div className="">
                   <main className="py-6 rounded-lg">
                     { children }
