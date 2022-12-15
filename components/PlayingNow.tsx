@@ -8,7 +8,7 @@ const PlayingNow = ({ currentSequence }: PlayingNowProps) => {
   return (
     <>
       <h2 className="text-xl mb-2">
-        Currently Playing <b>{ currentSequence.currentSequence }</b>.
+        Currently Playing <b className="text-gradient">{ currentSequence.currentSequence }</b>.
       </h2>
     </>
   );

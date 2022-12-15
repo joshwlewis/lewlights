@@ -27,7 +27,7 @@ const LewMap: React.FC = () => {
   return <div ref={ref} id="LewLightsMap" />;
 }
 
-const Map: React.FC = () => {
+const ShowMap: React.FC = () => {
   return (
     <div style={style}>
       <Wrapper apiKey={apiKey} render={render}>
@@ -37,4 +37,4 @@ const Map: React.FC = () => {
   );
 }
 
-export default Map;
+export default ShowMap;

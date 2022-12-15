@@ -1,11 +1,11 @@
 import type { GetStaticProps } from "next";
 import { Secret, sign } from "jsonwebtoken";
-import { CurrentSequenceData, SequenceData, ShowStatusData } from "../interfaces"
+import { CurrentSequenceData, SequenceData } from "../interfaces"
 import PlayingNow from "../components/PlayingNow";
 import PlayingNext from "../components/PlayingNext";
 import Playlist from "../components/Playlist";
 import ErrorFlash from "../components/ErrorFlash";
-import Map from "../components/Map";
+import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
 
 
@@ -22,8 +22,8 @@ const Index = ({currentSequence, nextSequence, sequences, error}: IndexProps) =>
   let playlist = sequences ? <Playlist sequences={sequences} />: null;
   let errorFlash = error ? <ErrorFlash error={error} />: null;
   return (
-    <>
-      <div id="home">
+    <div className="text-gray-300 text-center">
+      <div id="about">
         <div className="flex justify-center my-8">
           <div className="w-3/4 md:w-2/3 lg:w-1/2">
             <video autoPlay loop muted className=''>
@@ -34,20 +34,29 @@ const Index = ({currentSequence, nextSequence, sequences, error}: IndexProps) =>
             </video>
           </div>
         </div>
+        <p>LewLights is a Holiday light show by the Lewis family in Lakeland, TN.</p>
+        <p>Feel free to drop by and watch for a while.</p>
+        <p>Listen along in your vehicle by tuning to FM 90.5</p>
+        <p>Remember: DO NOT PRESS THE BUTTON!</p>
       </div>
       <div id="status" className="text-gray-200">
+        <h2>Show Status</h2>
         { errorFlash }
         { playingNow }
         { playingNext }
         { playlist }
       </div>
+      <div id="donate">
+      </div>
       <div id="map">
-        <Map />
+        <h2>Our Location and Map</h2>
+        <ShowMap />
       </div>
       <div id="videos">
+        <h2>Our Present and Past Videos</h2>
         <Videos />
       </div>
-    </>
+    </div>
     );
 };
 

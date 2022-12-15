@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 const pages: Record<string, string> = {
-  "#home": 'home',
+  "#about": 'about',
   "#status": "status",
   "#donate": 'donate',
   "#map": 'map',
@@ -23,16 +23,16 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
       <div className="color-gradient min-h-screen">
         <div className="dots min-h-screen">
           <div className="diagonal-wash min-h-screen">
-            <div className="container mx-auto py-2 px-4 divide-y divide-gray-500">
+            <div className="container mx-auto px-8">
               <header className="py-2">
-                  <div className="flex flex-shrink">
-                  <h3 className="text-3xl my-4 font-bold font-mono text-gradient">
-                    <span>••••</span>
-                    <Link href="/">lewlights</Link>
-                    <span>••••</span>
-                  </h3>
+                  <div className="flex flex-shrink justify-center">
+                    <h3 className="text-3xl my-3 font-bold font-mono text-gradient">
+                      <span>••••</span>
+                      <Link href="/">lewlights</Link>
+                      <span>••••</span>
+                    </h3>
                   </div>
-                  <div className="flex font-mono text-sm">
+                  <div className="flex font-mono justify-center text-sm">
                     <div className="shrink text-gradient">
                       <div className="flex gap-6">
                         {Object.keys(pages).map((page) => {
@@ -48,9 +48,9 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                     </div>
                   </div>
               </header>
-              <div className="h-full py-10">
+              <div className="h-full py-4">
                 <div className="">
-                  <main className="py-6 rounded-lg">
+                  <main className="rounded-lg">
                     { children }
                   </main>
                 </div>
