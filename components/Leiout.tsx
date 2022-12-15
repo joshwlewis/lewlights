@@ -9,7 +9,7 @@ const pages: Record<string, string> = {
   videos: 'videos'
 };
 
-export default function Layout({ children }: React.PropsWithChildren<{}>) {
+export default function Leiout({ children }: React.PropsWithChildren<{}>) {
   return(
     <>
       <Head>

@@ -1,9 +1,25 @@
-import type { GetStaticProps, NextPage } from "next";
-import { useState, useEffect } from "react";
+import type { GetStaticProps } from "next";
 import { Secret, sign } from "jsonwebtoken";
-import Map from "../components/map";
+import { CurrentSequenceData, SequenceData, ShowStatusData } from "../interfaces"
+import PlayingNow from "../components/PlayingNow";
+import PlayingNext from "../components/PlayingNext";
+import Playlist from "../components/Playlist";
+import ErrorFlash from "../components/ErrorFlash";
+import Map from "../components/Map";
 
-const Index: NextPage = (props) => {
+
+interface IndexProps {
+  sequences?: SequenceData[],
+  currentSequence?: CurrentSequenceData,
+  nextSequence?: CurrentSequenceData,
+  error?: String,
+}
+
+const Index = ({currentSequence, nextSequence, sequences, error}: IndexProps) => {
+  let playingNow = currentSequence ? <PlayingNow currentSequence={currentSequence} /> : null;
+  let playingNext = nextSequence ? <PlayingNext nextSequence={nextSequence} /> : null;
+  let playlist = sequences ? <Playlist sequences={sequences} />: null;
+  let errorFlash = error ? <ErrorFlash error={error} />: null;
   return (
     <>
       <div id="home">
@@ -18,27 +34,11 @@ const Index: NextPage = (props) => {
           </div>
         </div>
       </div>
-      <div id="status">
-        <div className="text-gray-200">
-          <h2 className="text-xl mb-2">
-            Currently Playing <b>{ props.currentSequence.currentSequence }</b>.
-          </h2>
-          <h2 className="text-lg">
-            Current Playlist
-          </h2>
-          <ul>
-            { props.sequences.filter((sequence) => sequence.sequenceVisible).map((sequence) => {
-              return (
-                <li>{ sequence.sequenceName }</li>
-              )
-            })}
-          </ul>
-        </div>
-        <div className="text-gray-200 my-6">
-          <h4 className="text-xl mb-2">
-            Have a great year!
-          </h4>
-        </div>
+      <div id="status" className="text-gray-200">
+        { errorFlash }
+        { playingNow }
+        { playingNext }
+        { playlist }
       </div>
       <div id="map">
         <Map />
@@ -47,7 +47,7 @@ const Index: NextPage = (props) => {
     );
 };
 
-async function fetchRemoteFalconJson(jwt: String, path: String): Promise<JSON> {
+async function fetchRemoteFalconJson(jwt: String, path: String): Promise<unknown> {
   const res = await fetch(
     `https://remotefalcon.com/remotefalcon/api/external/subdomain/${path}`, {
       method: 'GET',
@@ -62,21 +62,28 @@ async function fetchRemoteFalconJson(jwt: String, path: String): Promise<JSON> {
 }
 
 export const getServerSideProps: GetStaticProps = async (context) => {
-  console.log("getting server side props");
   console.dir(context);
   const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-token';
   const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-secret';
   const jwt = sign({ accessToken }, secretKey);
-  const [sequences, currentSequence, nextSequence ] = await Promise.all(
-    [
-      fetchRemoteFalconJson(jwt, 'lewlights/sequences'),
-      fetchRemoteFalconJson(jwt, 'lewlights/currentlyPlaying'),
-      fetchRemoteFalconJson(jwt, 'lewlights/nextSequenceInQueue'),
-    ]
-  );
-  let props = { sequences, currentSequence, nextSequence };
-  console.dir(props);
-  return { props };
+  try {
+    const [sequences, currentSequence, nextSequence ] = await Promise.all(
+      [
+        fetchRemoteFalconJson(jwt, 'lewlights/sequences'),
+        fetchRemoteFalconJson(jwt, 'lewlights/currentlyPlaying'),
+        fetchRemoteFalconJson(jwt, 'lewlights/nextSequenceInQueue'),
+      ]
+    );
+    let props = {
+      sequences: sequences as SequenceData[],
+      currentSequence: currentSequence as CurrentSequenceData,
+      nextSequence: nextSequence as CurrentSequenceData,
+    };
+    console.dir(props);
+    return { props };
+  } catch(err: any) {
+    return { props: { error: err.message } }
+  }
 }
 
 export default Index;
