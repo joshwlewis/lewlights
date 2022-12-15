@@ -6,6 +6,7 @@ import PlayingNext from "../components/PlayingNext";
 import Playlist from "../components/Playlist";
 import ErrorFlash from "../components/ErrorFlash";
 import Map from "../components/Map";
+import Videos from "../components/Videos";
 
 
 interface IndexProps {
@@ -42,6 +43,9 @@ const Index = ({currentSequence, nextSequence, sequences, error}: IndexProps) =>
       </div>
       <div id="map">
         <Map />
+      </div>
+      <div id="videos">
+        <Videos />
       </div>
     </>
     );

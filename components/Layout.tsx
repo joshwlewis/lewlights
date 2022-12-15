@@ -2,14 +2,14 @@ import Head from "next/head";
 import Link from "next/link";
 
 const pages: Record<string, string> = {
-  "": 'home',
+  "#home": 'home',
   "#status": "status",
+  "#donate": 'donate',
   "#map": 'map',
-  playlist: 'playlist',
-  videos: 'videos'
+  "#videos": 'videos'
 };
 
-export default function Leiout({ children }: React.PropsWithChildren<{}>) {
+export default function Layout({ children }: React.PropsWithChildren<{}>) {
   return(
     <>
       <Head>
