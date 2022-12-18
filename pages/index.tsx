@@ -10,17 +10,17 @@ import Videos from "../components/Videos";
 
 
 interface IndexProps {
-  sequences?: SequenceData[],
+  sequences: SequenceData[],
   currentSequence?: CurrentSequenceData,
   nextSequence?: CurrentSequenceData,
-  error?: String,
+  errors: String[],
 }
 
-const Index = ({currentSequence, nextSequence, sequences, error}: IndexProps) => {
+const Index = ({currentSequence, nextSequence, sequences, errors}: IndexProps) => {
   let playingNow = currentSequence ? <PlayingNow currentSequence={currentSequence} /> : null;
   let playingNext = nextSequence ? <PlayingNext nextSequence={nextSequence} /> : null;
   let playlist = sequences ? <Playlist sequences={sequences} />: null;
-  let errorFlash = error ? <ErrorFlash error={error} />: null;
+  let errorFlash = errors ? <ErrorFlash />: null;
   return (
     <div className="text-gray-300 text-center">
       <div id="about">
@@ -60,8 +60,8 @@ const Index = ({currentSequence, nextSequence, sequences, error}: IndexProps) =>
     );
 };
 
-async function fetchRemoteFalconJson(jwt: String, path: String): Promise<unknown> {
-  const res = await fetch(
+async function fetchRemoteFalconData(jwt: String, path: String): Promise<{ error?: String, data?: any }> {
+  let res = await fetch(
     `https://remotefalcon.com/remotefalcon/api/external/subdomain/${path}`, {
       method: 'GET',
       headers: new Headers({
@@ -71,32 +71,65 @@ async function fetchRemoteFalconJson(jwt: String, path: String): Promise<unknown
       })
     }
   );
-  return await res.json();
+  let json: any;
+  switch (res.status) {
+    case 200:
+      json = await res.json();
+      return { data: json };
+    case 204:
+      return {};
+    case 400:
+    case 401:
+      json = await res.json();
+      return { error: json.message as String };
+    case 429:
+      json = await res.json();
+      return { error: json as String };
+    default:
+      console.log("Unknown error:", res);
+      return { error: "Unknown error" };
+  }
+}
+
+async function fetchSequences(jwt: String): Promise<{ error?: String, data?: SequenceData[] }> {
+  return await fetchRemoteFalconData(jwt, "lewlights/sequences");
+}
+
+async function fetchCurrentSequence(jwt: String): Promise<{ error?: String, data?: CurrentSequenceData }> {
+  return await fetchRemoteFalconData(jwt, "lewlights/currentlyPlaying");
+}
+
+async function fetchNextSequence(jwt: String): Promise<{ error?: String, data?: CurrentSequenceData }> {
+  return await fetchRemoteFalconData(jwt, "lewlights/nextSequenceInQueue");
 }
 
 export const getServerSideProps: GetStaticProps = async (context) => {
-  console.dir(context);
+  console.log("getServerSideProps", context);
   const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-token';
   const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-secret';
   const jwt = sign({ accessToken }, secretKey);
+
+  let props;
   try {
-    const [sequences, currentSequence, nextSequence ] = await Promise.all(
+    const [sequencesRes, currentSequenceRes, nextSequenceRes ] = await Promise.all(
       [
-        fetchRemoteFalconJson(jwt, 'lewlights/sequences'),
-        fetchRemoteFalconJson(jwt, 'lewlights/currentlyPlaying'),
-        fetchRemoteFalconJson(jwt, 'lewlights/nextSequenceInQueue'),
+        fetchSequences(jwt),
+        fetchCurrentSequence(jwt),
+        fetchNextSequence(jwt),
       ]
     );
-    let props = {
-      sequences: sequences as SequenceData[],
-      currentSequence: currentSequence as CurrentSequenceData,
-      nextSequence: nextSequence as CurrentSequenceData,
+    let errors = [sequencesRes.error, currentSequenceRes.error, nextSequenceRes.error].filter((e) => e);
+    props = {
+      errors,
+      sequences: sequencesRes.data || null,
+      currentSequence: currentSequenceRes.data || null,
+      nextSequence: nextSequenceRes.data || null,
     };
-    console.dir(props);
-    return { props };
-  } catch(err: any) {
-    return { props: { error: err.message } }
+  } catch (err) {
+    props = { errors: [err] };
   }
+  console.dir(props);
+  return { props };
 }
 
 export default Index;
