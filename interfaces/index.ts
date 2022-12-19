@@ -9,8 +9,8 @@ export interface CurrentSequenceData {
 }
 
 export interface SequenceData {
-  sequenceName: String,
-  sequenceDisplayName: String,
+  sequenceName: string,
+  sequenceDisplayName: string,
   sequenceVisible: boolean,
 }
 

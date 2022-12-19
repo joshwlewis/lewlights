@@ -4,16 +4,14 @@ interface PlaylistProps {
   sequences: SequenceData[]
 }
 
-const PlayingNow = ({ sequences }: PlaylistProps) => {
+const Playinglist = ({ sequences }: PlaylistProps) => {
   let visibleSequences = sequences.filter((seq) => seq.sequenceVisible);
   return (
     <>
       <ul>
         { visibleSequences.map((sequence) => {
           return (
-            <>
-              <li>{ sequence.sequenceDisplayName }</li>
-            </>
+            <li key={ sequence.sequenceName }>{ sequence.sequenceDisplayName }</li>
           )
         })}
       </ul>
@@ -21,4 +19,4 @@ const PlayingNow = ({ sequences }: PlaylistProps) => {
   );
 }
 
-export default PlayingNow;
+export default Playinglist;

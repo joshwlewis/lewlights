@@ -20,11 +20,11 @@ const Index = ({currentSequence, nextSequence, sequences, errors}: IndexProps) =
   let playingNow = currentSequence ? <PlayingNow currentSequence={currentSequence} /> : null;
   let playingNext = nextSequence ? <PlayingNext nextSequence={nextSequence} /> : null;
   let playlist = sequences ? <Playlist sequences={sequences} />: null;
-  let errorFlash = errors ? <ErrorFlash />: null;
+  let errorFlash = errors.some((err) => err) ? <ErrorFlash />: null;
   return (
     <div className="text-gray-300 text-center">
       <div id="about">
-        <div className="flex justify-center my-8">
+        <div className="flex justify-center my-4">
           <div className="w-3/4 md:w-2/3 lg:w-1/2">
             <video autoPlay loop muted className=''>
               <source
@@ -34,12 +34,14 @@ const Index = ({currentSequence, nextSequence, sequences, errors}: IndexProps) =
             </video>
           </div>
         </div>
-        <p>LewLights is a Holiday light show by the Lewis family in Lakeland, TN.</p>
-        <p>Feel free to drop by and watch for a while.</p>
-        <p>Listen along in your vehicle by tuning to FM 90.5</p>
-        <p>Remember: DO NOT PRESS THE BUTTON!</p>
+        <h4 className="text-lg my-4">
+          LewLights is a Holiday light show by the Lewis family in Lakeland, TN.
+          Feel free to drop by to watch and listen for a while.
+          Tune to <b>FM 90.5</b> to enjoy from your vehicle.
+        </h4>
+        <h3 className="text-xl my-4">Remember: <span className="text-red-600">DO NOT PRESS THE BUTTON!</span> &#x1F609;</h3>
       </div>
-      <div id="status" className="text-gray-200">
+      <div id="status">
         <h2>Show Status</h2>
         { errorFlash }
         { playingNow }
