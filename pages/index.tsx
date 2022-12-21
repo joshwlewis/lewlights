@@ -11,15 +11,15 @@ import Videos from "../components/Videos";
 
 
 interface IndexProps {
-  offline: String | null,
+  offlineDuration: String | null,
   sequences: SequenceData[],
   currentSequence: CurrentSequenceData | null,
   nextSequence: CurrentSequenceData | null,
   errors: String[],
 }
 
-const Index = ({offline, currentSequence, nextSequence, sequences, errors}: IndexProps) => {
-  let offlineStatus = offline ? <OfflineStatus status={offline} /> : null;
+const Index = ({offlineDuration, currentSequence, nextSequence, sequences, errors}: IndexProps) => {
+  let offlineStatus = offlineDuration ? <OfflineStatus duration={ offlineDuration } /> : null;
   let playingNow = currentSequence ? <PlayingNow currentSequence={currentSequence} /> : null;
   let playingNext = nextSequence ? <PlayingNext nextSequence={nextSequence} /> : null;
   let playlist = sequences ? <Playlist sequences={sequences} />: null;
@@ -118,7 +118,7 @@ async function fetchNextSequence(jwt: String): Promise<{ error?: String, data?: 
   return await fetchRemoteFalconData(jwt, "lewlights/nextSequenceInQueue");
 }
 
-function getOfflineStatus(): String | null {
+function getOfflineDuration(): String | null {
   let now = new Date(Date.now());
   let month = now.getMonth();
   let day = now.getDay();
@@ -141,10 +141,10 @@ function getOfflineStatus(): String | null {
 
 export const getServerSideProps: GetStaticProps = async (context) => {
   console.log("getServerSideProps", context);
-  const offline = getOfflineStatus();
+  const offlineDuration = getOfflineDuration();
   let props: IndexProps;
-  if (offline) {
-    props = { offline, errors: [], sequences: [], currentSequence: null, nextSequence: null }
+  if (offlineDuration) {
+    props = { offlineDuration, errors: [], sequences: [], currentSequence: null, nextSequence: null }
   } else {
     const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-token';
     const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-secret';
@@ -159,14 +159,14 @@ export const getServerSideProps: GetStaticProps = async (context) => {
       );
       let errors = [sequencesRes.error, currentSequenceRes.error, nextSequenceRes.error].filter((e) => e) as string[];
       props = {
-        offline: null,
+        offlineDuration: null,
         errors,
         sequences: sequencesRes.data || [],
         currentSequence: currentSequenceRes.data || null,
         nextSequence: nextSequenceRes.data || null,
       };
     } catch (err) {
-      props = { offline, errors: [err as string], currentSequence: null, nextSequence: null, sequences: [] };
+      props = { offlineDuration, errors: [err as string], currentSequence: null, nextSequence: null, sequences: [] };
     }
   }
   console.dir(props);
