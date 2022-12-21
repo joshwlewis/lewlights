@@ -57,13 +57,13 @@ const Index = ({offline, currentSequence, nextSequence, sequences, errors}: Inde
         { playlist }
         <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
       </div>
-      <div id="donate">
+      <div id="donate" className="my-8">
         <h2 className="underline">Support our Show</h2>
         <p>
-          In liue of direct donations, consider supporting the Lakeland Education Foundation by voting (with donations) for &quot;LewLights&quot; in the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://lakelandchristmaslights.bubbleapps.io/">Lakeland Festival of Lights</a>.
+          In liue of direct donations, consider supporting the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://supportlakelandschools.org/">Lakeland Education Foundation</a> by voting (with donations) for &quot;LewLights&quot; in the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://lakelandchristmaslights.bubbleapps.io/">Lakeland Festival of Lights</a>.
         </p>
       </div>
-      <div id="map">
+      <div id="map" className="my-8">
         <h2 className="underline">Our Location and Map</h2>
         <ShowMap />
       </div>
