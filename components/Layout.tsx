@@ -23,7 +23,7 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
       <div className="color-gradient min-h-screen">
         <div className="dots min-h-screen">
           <div className="diagonal-wash min-h-screen">
-            <div className="container mx-auto px-8">
+            <div className="container mx-auto px-2 sm:px-4 md:px-16 lg:px-64 xl:px-[24rem]">
               <header className="py-2">
                   <div className="flex flex-shrink justify-center">
                     <h3 className="text-3xl my-3 font-bold font-mono text-gradient">
@@ -48,12 +48,10 @@ export default function Layout({ children }: React.PropsWithChildren<{}>) {
                     </div>
                   </div>
               </header>
-              <div className="h-full py-4">
-                <div className="">
-                  <main className="rounded-lg">
-                    { children }
-                  </main>
-                </div>
+              <div className="h-full">
+                <main>
+                  { children }
+                </main>
               </div>
               <footer className="text-gray-400 text-center p-6">
                 <address>10480 Mt McKenzie Rd, Lakeland TN, 38002</address>
