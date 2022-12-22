@@ -26,18 +26,18 @@ const Index = ({offlineDuration, currentSequence, nextSequence, sequences, error
   let errorFlash = errors.some((err) => err) ? <ErrorFlash />: null;
   return (
     <div className="text-gray-300 text-center">
-      <div id="about" className="my-8">
-        <div className="flex justify-center my-4">
-          <div className="w-3/4 md:w-2/3 lg:w-1/2">
-            <video autoPlay loop muted className=''>
-              <source
-                src='lewlights-hero.mp4'
-                type='video/mp4'
-              />
-            </video>
-          </div>
+      <div className="flex justify-center my-4">
+        <div className="w-3/4 md:w-2/3">
+          <video autoPlay loop muted className=''>
+            <source
+              src='lewlights-hero.mp4'
+              type='video/mp4'
+            />
+          </video>
         </div>
-        <h2 className="underline">About</h2>
+      </div>
+      <div id="about" className="my-8">
+        <h2 className="underline my-4">About</h2>
         <p className="my-4">
           LewLights is a holiday light show by the Lewis family in Lakeland, TN.
           We would love to have you stop for a bit to watch and listen. 
@@ -49,7 +49,7 @@ const Index = ({offlineDuration, currentSequence, nextSequence, sequences, error
         </p>
       </div>
       <div id="status" className="my-8">
-        <h2 className="underline">Show Status</h2>
+        <h2 className="underline my-4">Show Status</h2>
         { offlineStatus }
         { errorFlash }
         { playingNow }
@@ -58,17 +58,20 @@ const Index = ({offlineDuration, currentSequence, nextSequence, sequences, error
         <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
       </div>
       <div id="donate" className="my-8">
-        <h2 className="underline">Support our Show</h2>
+        <h2 className="underline my-4">Support our Show</h2>
         <p>
-          In liue of direct donations, consider supporting the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://supportlakelandschools.org/">Lakeland Education Foundation</a> by voting (with donations) for &quot;LewLights&quot; in the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://lakelandchristmaslights.bubbleapps.io/">Lakeland Festival of Lights</a>.
+          In liue of direct support, consider donating to the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://supportlakelandschools.org/">Lakeland Education Foundation</a> by voting for &quot;LewLights&quot; in the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://lakelandchristmaslights.bubbleapps.io/">Lakeland Festival of Lights</a>.
         </p>
+        <div className="my-6">
+          <a href="https://www.paypal.com/webapps/shoppingcart?flowlogging_id=f858889289f8d&mfid=1671672699267_f858889289f8d#/checkout/openButton" className="px-4 py-3 text-blue-100 no-underline bg-blue-500 rounded hover:bg-blue-600 hover:underline hover:text-blue-200">Vote for LewLights</a>
+        </div>
       </div>
       <div id="map" className="my-8">
-        <h2 className="underline">Our Location and Map</h2>
+        <h2 className="underline my-4">Our Location and Map</h2>
         <ShowMap />
       </div>
-      <div id="videos">
-        <h2 className="underline">Our Present and Past Videos</h2>
+      <div id="videos" className="my-8">
+        <h2 className="underline my-4">Our Present and Past Videos</h2>
         <Videos />
       </div>
     </div>
@@ -87,6 +90,7 @@ async function fetchRemoteFalconData(jwt: String, path: String): Promise<{ error
     }
   );
   let json: any;
+  console.log("res:", res);
   switch (res.status) {
     case 200:
       json = await res.json();
@@ -123,18 +127,18 @@ function getOfflineDuration(): String | null {
   let month = now.getMonth();
   let day = now.getDay();
   if (month > 1 && month < 10) {
-    return 'Season';
+    return 'season';
   }
   if (month == 10 && day < 28) {
-    return 'Season';
+    return 'season';
   }
   if (month == 1 && day > 4) {
-    return 'Season';
+    return 'season';
   }
   let currentHour = parseInt(now.toLocaleString('en-US', {hour: '2-digit',   hour12: false, timeZone: 'America/Chicago' }));
   console.log("currenthour:", currentHour);
   if (currentHour < 17 || currentHour > 21) {
-    return 'Evening';
+    return 'evening';
   }
   return null;
 }
@@ -166,7 +170,8 @@ export const getServerSideProps: GetStaticProps = async (context) => {
         nextSequence: nextSequenceRes.data || null,
       };
     } catch (err) {
-      props = { offlineDuration, errors: [err as string], currentSequence: null, nextSequence: null, sequences: [] };
+      console.log("Error", err);
+      props = { offlineDuration, errors: [JSON.stringify(err)], currentSequence: null, nextSequence: null, sequences: [] };
     }
   }
   console.dir(props);

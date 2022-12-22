@@ -3,10 +3,10 @@ import { Status, Wrapper } from "@googlemaps/react-wrapper";
 
 const style = {
   minHeight: "400px",
-  maxWidth: "100%"
+  maxWidth: "100%",
 };
-const center = {lat: 35.14, lng: -89.85};
-const position = { lat: 35.25350, lng: -89.71314 };
+const center = { lat: 35.15214586165782, lng: -89.83190139211116 };
+const position = {lat: 35.25339620205391, lng: -89.71305174978197 };
 const apiKey = "AIzaSyCkl3_x1NNVCQfvdVpMH1B044P_7bNjJN8";
 
 const render = (status: Status) => {
@@ -19,21 +19,19 @@ const LewMap: React.FC = () => {
   useEffect(() => {
     const map = new window.google.maps.Map(ref.current, {
       center,
-      zoom: 4,
+      zoom: 10,
     });
     new google.maps.Marker({ position, map });
   });
 
-  return <div ref={ref} id="LewLightsMap" />;
+  return <div ref={ref} id="LewLightsMap" style={style} />;
 }
 
 const ShowMap: React.FC = () => {
   return (
-    <div style={style}>
-      <Wrapper apiKey={apiKey} render={render}>
-        <LewMap />
-      </Wrapper>
-    </div>
+    <Wrapper apiKey={apiKey} render={render}>
+      <LewMap />
+    </Wrapper>
   );
 }
 
