@@ -7,7 +7,6 @@ const style = {
 };
 const center = { lat: 35.15214586165782, lng: -89.83190139211116 };
 const position = {lat: 35.25339620205391, lng: -89.71305174978197 };
-const apiKey = "AIzaSyCkl3_x1NNVCQfvdVpMH1B044P_7bNjJN8";
 
 const render = (status: Status) => {
   return <h1>{status}</h1>;
@@ -27,9 +26,13 @@ const LewMap: React.FC = () => {
   return <div ref={ref} id="LewLightsMap" style={style} />;
 }
 
-const ShowMap: React.FC = () => {
+interface ShowMapProps {
+  googleMapsApiKey: string
+}
+
+const ShowMap= ({ googleMapsApiKey }: ShowMapProps) => {
   return (
-    <Wrapper apiKey={apiKey} render={render}>
+    <Wrapper apiKey={googleMapsApiKey} render={render}>
       <LewMap />
     </Wrapper>
   );

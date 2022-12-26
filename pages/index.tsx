@@ -11,14 +11,16 @@ import Videos from "../components/Videos";
 
 
 interface IndexProps {
-  offlineDuration: String | null,
+  remoteFalconKey: string,
+  googleMapsKey: string,
+  offlineDuration: string | null,
   sequences: SequenceData[],
   currentSequence: CurrentSequenceData | null,
   nextSequence: CurrentSequenceData | null,
-  errors: String[],
+  errors: string[],
 }
 
-const Index = ({offlineDuration, currentSequence, nextSequence, sequences, errors}: IndexProps) => {
+const Index = ({googleMapsKey, offlineDuration, currentSequence, nextSequence, sequences, errors}: IndexProps) => {
   let offlineStatus = offlineDuration ? <OfflineStatus duration={ offlineDuration } /> : null;
   let playingNow = currentSequence ? <PlayingNow currentSequence={currentSequence} /> : null;
   let playingNext = nextSequence ? <PlayingNext nextSequence={nextSequence} /> : null;
@@ -68,7 +70,7 @@ const Index = ({offlineDuration, currentSequence, nextSequence, sequences, error
       </div>
       <div id="map" className="my-8">
         <h2 className="underline my-4">Our Location and Map</h2>
-        <ShowMap />
+        <ShowMap googleMapsApiKey={ googleMapsKey }/>
       </div>
       <div id="videos" className="my-8">
         <h2 className="underline my-4">Our Present and Past Videos</h2>
@@ -78,9 +80,13 @@ const Index = ({offlineDuration, currentSequence, nextSequence, sequences, error
     );
 };
 
-function getRemoteFalconJwt(): String {
-  const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-token';
-  const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-secret';
+function getGoogleMapsKey(): String {
+  return process.env.GOOGLEMAPS_API_KEY || 'example-google-maps-token';
+}
+
+function getRemoteFalconKey(): String {
+  const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-remote-falcon-token';
+  const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-remote-falcon-secret';
   return sign({ accessToken }, secretKey);
 }
 
@@ -152,22 +158,19 @@ function getOfflineDuration(): String | null {
 export const getServerSideProps: GetStaticProps = async (context) => {
   console.log("getServerSideProps", context);
   const offlineDuration = getOfflineDuration();
-  let props: IndexProps;
-  if (offlineDuration) {
-    props = { offlineDuration, errors: [], sequences: [], currentSequence: null, nextSequence: null }
-  } else {
-    const jwt = getRemoteFalconJwt();
+  let props: IndexProps = { googleMapsKey: getGoogleMapsKey(), remoteFalconKey: getRemoteFalconKey(), offlineDuration, errors: [], sequences: [], currentSequence: null, nextSequence: null };
+  if (!offlineDuration) {
+    const jwt = getRemoteFalconKey();
     try {
       const [sequencesRes, currentSequenceRes, nextSequenceRes ] = await Promise.all(
         [
-          fetchSequences(jwt),
-          fetchCurrentSequence(jwt),
-          fetchNextSequence(jwt),
+          fetchSequences(props.remoteFalconKey),
+          fetchCurrentSequence(props.remoteFalconKey),
+          fetchNextSequence(props.remoteFalconKey),
         ]
       );
       let errors = [sequencesRes.error, currentSequenceRes.error, nextSequenceRes.error].filter((e) => e) as string[];
-      props = {
-        offlineDuration: null,
+      props = { ...props, 
         errors,
         sequences: sequencesRes.data || [],
         currentSequence: currentSequenceRes.data || null,
@@ -175,7 +178,7 @@ export const getServerSideProps: GetStaticProps = async (context) => {
       };
     } catch (err) {
       console.log("Error", err);
-      props = { offlineDuration, errors: [JSON.stringify(err)], currentSequence: null, nextSequence: null, sequences: [] };
+      props = { ...props, errors: [JSON.stringify(err)] };
     }
   }
   console.dir(props);
