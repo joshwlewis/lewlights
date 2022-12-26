@@ -78,6 +78,12 @@ const Index = ({offlineDuration, currentSequence, nextSequence, sequences, error
     );
 };
 
+function getRemoteFalconJwt(): String {
+  const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-token';
+  const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-secret';
+  return sign({ accessToken }, secretKey);
+}
+
 async function fetchRemoteFalconData(jwt: String, path: String): Promise<{ error?: String, data?: any }> {
   let res = await fetch(
     `https://remotefalcon.com/remotefalcon/api/external/subdomain/${path}`, {
@@ -150,9 +156,7 @@ export const getServerSideProps: GetStaticProps = async (context) => {
   if (offlineDuration) {
     props = { offlineDuration, errors: [], sequences: [], currentSequence: null, nextSequence: null }
   } else {
-    const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-token';
-    const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-secret';
-    const jwt = sign({ accessToken }, secretKey);
+    const jwt = getRemoteFalconJwt();
     try {
       const [sequencesRes, currentSequenceRes, nextSequenceRes ] = await Promise.all(
         [
