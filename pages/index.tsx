@@ -1,4 +1,5 @@
 import type { GetStaticProps } from "next";
+import { useState, useEffect } from 'react'
 import { Secret, sign } from "jsonwebtoken";
 import { CurrentSequenceData, SequenceData } from "../interfaces"
 import OfflineStatus from "../components/OfflineStatus";
@@ -13,19 +14,36 @@ import Videos from "../components/Videos";
 interface IndexProps {
   remoteFalconKey: string,
   googleMapsKey: string,
-  offlineDuration: string | null,
-  sequences: SequenceData[],
-  currentSequence: CurrentSequenceData | null,
-  nextSequence: CurrentSequenceData | null,
-  errors: string[],
 }
 
-const Index = ({googleMapsKey, offlineDuration, currentSequence, nextSequence, sequences, errors}: IndexProps) => {
-  let offlineStatus = offlineDuration ? <OfflineStatus duration={ offlineDuration } /> : null;
-  let playingNow = currentSequence ? <PlayingNow currentSequence={currentSequence} /> : null;
-  let playingNext = nextSequence ? <PlayingNext nextSequence={nextSequence} /> : null;
-  let playlist = sequences ? <Playlist sequences={sequences} />: null;
-  let errorFlash = errors.some((err) => err) ? <ErrorFlash />: null;
+interface ShowStatus {
+  sequences?: SequenceData[],
+  currentSequence?: CurrentSequenceData,
+  nextSequence?: CurrentSequenceData,
+  errors?: string[],
+}
+
+interface IndexState {
+  offlineStatus?: string,
+  showStatus?: ShowStatus,
+}
+
+const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
+  const [sequences, setSequences] = useState<SequenceData[]>([])
+  const [currentSequence, setCurrentSequence] = useState<CurrentSequenceData | null>(null)
+  const [nextSequence, setNextSequence ] = useState<CurrentSequenceData | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  let offlineDuration = getOfflineDuration();
+
+  useEffect(() => {
+    if (!offlineDuration) {
+      fetchCurrentSequence(remoteFalconKey).then((res) => { setCurrentSequence(res.data || null) });
+      fetchNextSequence(remoteFalconKey).then((res) => { setNextSequence(res.data || null) });
+      fetchSequences(remoteFalconKey).then((res) => { setSequences(res.data || []) });
+    }
+  }, [remoteFalconKey, offlineDuration]);
+
   return (
     <div className="text-gray-300 text-center">
       <div className="flex justify-center my-4">
@@ -52,11 +70,11 @@ const Index = ({googleMapsKey, offlineDuration, currentSequence, nextSequence, s
       </div>
       <div id="status" className="my-8">
         <h2 className="underline my-4">Show Status</h2>
-        { offlineStatus }
-        { errorFlash }
-        { playingNow }
-        { playingNext }
-        { playlist }
+        { offlineDuration && <OfflineStatus duration={offlineDuration} /> }
+        { errors.length != 0 && <ErrorFlash /> }
+        { currentSequence && <PlayingNow currentSequence={ currentSequence } /> }
+        { nextSequence && <PlayingNext nextSequence={ nextSequence } /> }
+        { sequences && <Playlist sequences={ sequences } /> }
         <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
       </div>
       <div id="donate" className="my-8">
@@ -80,17 +98,17 @@ const Index = ({googleMapsKey, offlineDuration, currentSequence, nextSequence, s
     );
 };
 
-function getGoogleMapsKey(): String {
+function getGoogleMapsKey(): string {
   return process.env.GOOGLEMAPS_API_KEY || 'example-google-maps-token';
 }
 
-function getRemoteFalconKey(): String {
+function getRemoteFalconKey(): string {
   const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-remote-falcon-token';
   const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-remote-falcon-secret';
   return sign({ accessToken }, secretKey);
 }
 
-async function fetchRemoteFalconData(jwt: String, path: String): Promise<{ error?: String, data?: any }> {
+async function fetchRemoteFalconData(jwt: string, path: string): Promise<{ error?: string, data?: any }> {
   let res = await fetch(
     `https://remotefalcon.com/remotefalcon/api/external/subdomain/${path}`, {
       method: 'GET',
@@ -112,29 +130,29 @@ async function fetchRemoteFalconData(jwt: String, path: String): Promise<{ error
     case 400:
     case 401:
       json = await res.json();
-      return { error: json.message as String };
+      return { error: json.message as string };
     case 429:
       json = await res.json();
-      return { error: json as String };
+      return { error: json as string };
     default:
       console.log("Unknown error:", res);
       return { error: "Unknown error" };
   }
 }
 
-async function fetchSequences(jwt: String): Promise<{ error?: String, data?: SequenceData[] }> {
+async function fetchSequences(jwt: string): Promise<{ error?: string, data?: SequenceData[] }> {
   return await fetchRemoteFalconData(jwt, "lewlights/sequences");
 }
 
-async function fetchCurrentSequence(jwt: String): Promise<{ error?: String, data?: CurrentSequenceData }> {
+async function fetchCurrentSequence(jwt: string): Promise<{ error?: string, data?: CurrentSequenceData }> {
   return await fetchRemoteFalconData(jwt, "lewlights/currentlyPlaying");
 }
 
-async function fetchNextSequence(jwt: String): Promise<{ error?: String, data?: CurrentSequenceData }> {
+async function fetchNextSequence(jwt: string): Promise<{ error?: string, data?: CurrentSequenceData }> {
   return await fetchRemoteFalconData(jwt, "lewlights/nextSequenceInQueue");
 }
 
-function getOfflineDuration(): String | null {
+function getOfflineDuration(): string | null {
   let now = new Date(Date.now());
   let month = now.getMonth();
   let day = now.getDay();
@@ -157,32 +175,7 @@ function getOfflineDuration(): String | null {
 
 export const getServerSideProps: GetStaticProps = async (context) => {
   console.log("getServerSideProps", context);
-  const offlineDuration = getOfflineDuration();
-  let props: IndexProps = { googleMapsKey: getGoogleMapsKey(), remoteFalconKey: getRemoteFalconKey(), offlineDuration, errors: [], sequences: [], currentSequence: null, nextSequence: null };
-  if (!offlineDuration) {
-    const jwt = getRemoteFalconKey();
-    try {
-      const [sequencesRes, currentSequenceRes, nextSequenceRes ] = await Promise.all(
-        [
-          fetchSequences(props.remoteFalconKey),
-          fetchCurrentSequence(props.remoteFalconKey),
-          fetchNextSequence(props.remoteFalconKey),
-        ]
-      );
-      let errors = [sequencesRes.error, currentSequenceRes.error, nextSequenceRes.error].filter((e) => e) as string[];
-      props = { ...props, 
-        errors,
-        sequences: sequencesRes.data || [],
-        currentSequence: currentSequenceRes.data || null,
-        nextSequence: nextSequenceRes.data || null,
-      };
-    } catch (err) {
-      console.log("Error", err);
-      props = { ...props, errors: [JSON.stringify(err)] };
-    }
-  }
-  console.dir(props);
-  return { props };
+  return { props: { googleMapsKey: getGoogleMapsKey(), remoteFalconKey: getRemoteFalconKey() } };
 }
 
 export default Index;
