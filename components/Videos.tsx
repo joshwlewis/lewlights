@@ -1,9 +1,9 @@
 const vidUrls = [
-  "https://www.youtube-nocookie.com/embed/hkxFcFNEKa4",
-  "https://www.youtube-nocookie.com/embed/Rs-02QXyeNo",
-  "https://www.youtube-nocookie.com/embed/oQeiWbGsHxk",
-  "https://www.youtube-nocookie.com/embed/t_MNg7SGft",
-  "https://www.youtube-nocookie.com/embed/Tzwfy1Etkt8"
+  "https://www.youtube.com/embed/hkxFcFNEKa4",
+  "https://www.youtube.com/embed/Rs-02QXyeNo",
+  "https://www.youtube.com/embed/oQeiWbGsHxk",
+  "https://www.youtube.com/embed/t_MNg7SGft",
+  "https://www.youtube.com/embed/Tzwfy1Etkt8"
 ]
 
 const Videos = () => {

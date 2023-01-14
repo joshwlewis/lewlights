@@ -10,37 +10,25 @@ import ErrorFlash from "../components/ErrorFlash";
 import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
 
-
 interface IndexProps {
   remoteFalconKey: string,
   googleMapsKey: string,
-}
-
-interface ShowStatus {
-  sequences?: SequenceData[],
-  currentSequence?: CurrentSequenceData,
-  nextSequence?: CurrentSequenceData,
-  errors?: string[],
-}
-
-interface IndexState {
-  offlineStatus?: string,
-  showStatus?: ShowStatus,
 }
 
 const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   const [sequences, setSequences] = useState<SequenceData[]>([])
   const [currentSequence, setCurrentSequence] = useState<CurrentSequenceData | null>(null)
   const [nextSequence, setNextSequence ] = useState<CurrentSequenceData | null>(null);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  let logSetError = function(err: string) { console.error(err); setError(err); };
 
   let offlineDuration = getOfflineDuration();
 
   useEffect(() => {
     if (!offlineDuration) {
-      fetchCurrentSequence(remoteFalconKey).then((res) => { setCurrentSequence(res.data || null) });
-      fetchNextSequence(remoteFalconKey).then((res) => { setNextSequence(res.data || null) });
-      fetchSequences(remoteFalconKey).then((res) => { setSequences(res.data || []) });
+      fetchCurrentSequence(remoteFalconKey).then(setCurrentSequence).catch(logSetError);
+      fetchNextSequence(remoteFalconKey).then(setNextSequence).catch(logSetError);
+      fetchSequences(remoteFalconKey).then(setSequences).catch(logSetError);
     }
   }, [remoteFalconKey, offlineDuration]);
 
@@ -71,7 +59,7 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
       <div id="status" className="my-8">
         <h2 className="underline my-4">Show Status</h2>
         { offlineDuration && <OfflineStatus duration={offlineDuration} /> }
-        { errors.length != 0 && <ErrorFlash /> }
+        { error && <ErrorFlash /> }
         { currentSequence && <PlayingNow currentSequence={ currentSequence } /> }
         { nextSequence && <PlayingNext nextSequence={ nextSequence } /> }
         { sequences && <Playlist sequences={ sequences } /> }
@@ -108,7 +96,7 @@ function getRemoteFalconKey(): string {
   return sign({ accessToken }, secretKey);
 }
 
-async function fetchRemoteFalconData(jwt: string, path: string): Promise<{ error?: string, data?: any }> {
+async function fetchRemoteFalconData(jwt: string, path: string): Promise<any | null> {
   let res = await fetch(
     `https://remotefalcon.com/remotefalcon/api/external/subdomain/${path}`, {
       method: 'GET',
@@ -119,54 +107,47 @@ async function fetchRemoteFalconData(jwt: string, path: string): Promise<{ error
       })
     }
   );
-  let json: any;
-  console.log("res:", res);
   switch (res.status) {
     case 200:
-      json = await res.json();
-      return { data: json };
+      return await res.json();
     case 204:
-      return {};
-    case 400:
-    case 401:
-      json = await res.json();
-      return { error: json.message as string };
-    case 429:
-      json = await res.json();
-      return { error: json as string };
+      return null;
     default:
-      console.log("Unknown error:", res);
-      return { error: "Unknown error" };
+      let body = await res.text()
+      throw `Error retrieving show data: ${ body }`;
   }
 }
 
-async function fetchSequences(jwt: string): Promise<{ error?: string, data?: SequenceData[] }> {
+async function fetchSequences(jwt: string): Promise<SequenceData[]> {
   return await fetchRemoteFalconData(jwt, "lewlights/sequences");
 }
 
-async function fetchCurrentSequence(jwt: string): Promise<{ error?: string, data?: CurrentSequenceData }> {
+async function fetchCurrentSequence(jwt: string): Promise<CurrentSequenceData> {
   return await fetchRemoteFalconData(jwt, "lewlights/currentlyPlaying");
 }
 
-async function fetchNextSequence(jwt: string): Promise<{ error?: string, data?: CurrentSequenceData }> {
+async function fetchNextSequence(jwt: string): Promise<CurrentSequenceData> {
   return await fetchRemoteFalconData(jwt, "lewlights/nextSequenceInQueue");
 }
 
 function getOfflineDuration(): string | null {
   let now = new Date(Date.now());
-  let month = now.getMonth();
-  let day = now.getDay();
+  let month = now.getMonth() + 1;
+  let day = now.getDate();
+  // February to September
   if (month > 1 && month < 10) {
     return 'season';
   }
+  // October 1-27
   if (month == 10 && day < 28) {
     return 'season';
   }
+  // January 5-31
   if (month == 1 && day > 4) {
     return 'season';
   }
   let currentHour = parseInt(now.toLocaleString('en-US', {hour: '2-digit',   hour12: false, timeZone: 'America/Chicago' }));
-  console.log("currenthour:", currentHour);
+  // 10pm to 5pm
   if (currentHour < 17 || currentHour > 21) {
     return 'evening';
   }
@@ -174,7 +155,6 @@ function getOfflineDuration(): string | null {
 }
 
 export const getServerSideProps: GetStaticProps = async (context) => {
-  console.log("getServerSideProps", context);
   return { props: { googleMapsKey: getGoogleMapsKey(), remoteFalconKey: getRemoteFalconKey() } };
 }
 
