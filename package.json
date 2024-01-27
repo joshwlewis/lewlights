@@ -8,6 +8,9 @@
     "lint": "next lint",
     "fmt": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|tsx|jsx)\""
   },
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "@googlemaps/react-wrapper": "^1.1.35",
     "jsonwebtoken": "^8.5.1",
