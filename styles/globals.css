@@ -74,6 +74,7 @@
       %3E%3C/path%3E \
     %3C/svg%3E"
   );
+  background-size: 24px;
 }
 
 @tailwind utilities;
