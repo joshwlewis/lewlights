@@ -1,15 +1,19 @@
 const vidUrls = [
-  "https://www.youtube.com/embed/hkxFcFNEKa4",
+  "https://www.youtube.com/embed/RUZ1ViH22j8",
+  "https://www.youtube.com/embed/-DgnvvRjPiU",
+  "https://www.youtube.com/embed/P1WCtbceccU",
+  "https://www.youtube.com/embed/sEaDHzTwuZ4",
   "https://www.youtube.com/embed/Rs-02QXyeNo",
   "https://www.youtube.com/embed/oQeiWbGsHxk",
-  "https://www.youtube.com/embed/t_MNg7SGft",
+  "https://www.youtube.com/embed/t_MNg7SGftU",
+  "https://www.youtube.com/embed/ZV9ri20rCeQ",
   "https://www.youtube.com/embed/Tzwfy1Etkt8"
 ]
 
 const Videos = () => {
   return (
     <>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
+      <div className="grid gap-6 lg:grid-cols-2 justify-items-center">
         {vidUrls.map((url) => {
           return (
             <div key={url} className="w-80 h-44">
