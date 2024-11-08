@@ -1,14 +1,14 @@
-import { CurrentSequenceData } from '../interfaces';
+import { Sequence } from '../lib/remote_falcon';
 
-interface PlayingNowProps {
-  currentSequence: CurrentSequenceData
+interface Props {
+    sequence: Sequence
 }
 
-const PlayingNow = ({ currentSequence }: PlayingNowProps) => {
+const PlayingNow = ({ sequence }: Props) => {
   return (
     <>
       <h2 className="text-xl mb-2">
-        Currently Playing <b className="text-gradient">{ currentSequence.currentSequence }</b>.
+        Currently Playing: <b className="text-gradient">{ sequence.displayName || sequence.name }</b>
       </h2>
     </>
   );

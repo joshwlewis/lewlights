@@ -1,17 +1,18 @@
-import { SequenceData } from '../interfaces';
+import { Sequence } from '../lib/remote_falcon';
 
-interface PlaylistProps {
-  sequences: SequenceData[]
+interface Props {
+  sequences: Sequence[]
 }
 
-const Playinglist = ({ sequences }: PlaylistProps) => {
-  let visibleSequences = sequences.filter((seq) => seq.sequenceVisible);
+const Playinglist = ({ sequences }: Props) => {
+  let visibleSequences = sequences.filter((seq) => seq.visible);
   return (
     <>
+      <h3 class="underline">Playlist</h3>
       <ul>
-        { visibleSequences.map((sequence) => {
+        { visibleSequences.map((seq) => {
           return (
-            <li key={ sequence.sequenceName }>{ sequence.sequenceDisplayName }</li>
+            <li key={ seq.name }>{ seq.displayName || seq.name }</li>
           )
         })}
       </ul>
