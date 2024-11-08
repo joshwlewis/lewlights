@@ -33,6 +33,7 @@ export interface Sequence {
     displayName: string,
     artist: string,
     imageUrl: string,
+    visible: boolean,
 }
 
 export interface Show {
