@@ -7,7 +7,7 @@ import Playlist from "../components/Playlist";
 import ErrorFlash from "../components/ErrorFlash";
 import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
-import { queryRemoteFalcon, getRemoteFalconKey, Show } from "../lib/remote_falcon";
+import { queryRemoteFalcon, getRemoteFalconKey, Sequence, Show } from "../lib/remote_falcon";
 
 interface IndexProps {
   remoteFalconKey: string,
