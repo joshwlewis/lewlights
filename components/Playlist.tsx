@@ -8,7 +8,7 @@ const Playinglist = ({ sequences }: Props) => {
   let visibleSequences = sequences.filter((seq) => seq.visible);
   return (
     <>
-      <h3 class="underline">Playlist</h3>
+      <h3 className="underline">Playlist</h3>
       <ul>
         { visibleSequences.map((seq) => {
           return (
