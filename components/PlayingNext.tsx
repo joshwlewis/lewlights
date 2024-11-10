@@ -7,8 +7,12 @@ interface Props {
 const PlayingNow = ({ sequence }: Props) => {
   return (
     <>
-      <h2 className="text-xl mb-2">
-        Next up: <b className="text-gradient">{ sequence.displayName || sequence.name }</b>
+      <h3 className="text-l">Next Up</h3>
+      <h2 className="text-xl text-gradient">
+        { sequence.displayName || sequence.name }
+      </h2>
+      <h2 className="text-l text-gradient">
+        { sequence.artist }
       </h2>
     </>
   );

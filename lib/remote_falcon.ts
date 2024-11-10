@@ -28,6 +28,38 @@ export async function queryRemoteFalcon(jwt: string): Promise<Show> {
     }
 }
 
+export async function enqueueRemoteFalcon(jwt: string, sequence: Sequence): Promise<null> {
+    let res = await fetch(
+        'https://remotefalcon.com/remote-falcon-viewer/graphql', {
+            method: 'POST',
+            headers: new Headers({
+                'Authorization': `Bearer ${jwt}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }),
+            body: JSON.stringify({
+                variables: {
+                    name: sequence.name,
+                    latitude: 0,
+                    longitude: 0,
+                },
+                query: mutation,
+            })
+        });
+    switch (res.status) {
+      case 200:
+        let rf_data = await res.json() as RFData;
+        if (rf_data.errors && rf_data.errors.length > 0) {
+          throw rf_data.errors[0].message;
+        }
+        return null;
+      default:
+        let body = await res.text()
+        throw `Error enqueuing sequence: ${ body }`;
+    }
+
+}
+
 export interface Sequence {
     name: string,
     displayName: string,
@@ -47,8 +79,12 @@ export interface Show {
 export interface GetShow {
     getShow: Show
 }
+export interface Error {
+    message: string,
+}
 export interface RFData {
     data: GetShow
+    errors?: Error[],
 }
 
 const query = `{
@@ -134,3 +170,6 @@ const query = `{
 }`;
 
 
+const mutation = `mutation ($name: String!, $latitude: Float, $longitude: Float) {
+  addSequenceToQueue(name: $name, latitude: $latitude, longitude: $longitude)
+}`;

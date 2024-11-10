@@ -2,6 +2,7 @@ import type { GetStaticProps } from "next";
 import { useState, useEffect } from 'react'
 import OfflineStatus from "../components/OfflineStatus";
 import PlayingNow from "../components/PlayingNow";
+import NothingPlaying from "../components/NothingPlaying";
 import PlayingNext from "../components/PlayingNext";
 import Playlist from "../components/Playlist";
 import ErrorFlash from "../components/ErrorFlash";
@@ -54,8 +55,26 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
     getShowState();
     let interval = setInterval(getShowState, 1500);
     return () => clearInterval(interval);
-  }, [remoteFalconKey]);
+  }, [currentSequence, remoteFalconKey]);
 
+  function showStatus() {
+      if (offlineMessage) {
+          return <OfflineStatus message={offlineMessage} />;
+      }
+      let comps = [];
+      if (currentSequence) {
+        comps.push(<PlayingNow sequence={currentSequence} />);
+      } else {
+        comps.push(<NothingPlaying />);
+      }
+      if (nextSequence && (!currentSequence || nextSequence.name !== currentSequence.name)) {
+          comps.push(<PlayingNext sequence={nextSequence} />);
+      }
+      if (show && show.sequences.length >0) {
+          comps.push(<Playlist remoteFalconKey={remoteFalconKey} sequences={show.sequences} />);
+      }
+      return comps;
+  }
   return (
     <div className="text-gray-300 text-center">
       <div className="flex justify-center my-4">
@@ -82,12 +101,9 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
       </div>
       <div id="status" className="my-8">
         <h2 className="underline my-4">Show Status</h2>
-        { error && <ErrorFlash /> }
         { loading  && <Loading /> }
-        { offlineMessage && <OfflineStatus message={offlineMessage} /> }
-        { currentSequence && <PlayingNow sequence={ currentSequence } /> }
-        { nextSequence && <PlayingNext sequence={ nextSequence } /> }
-        { show && <Playlist sequences={ show.sequences } /> }
+        { error && <ErrorFlash /> }
+        { showStatus() }
         <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
       </div>
       <div id="donate" className="my-8">
