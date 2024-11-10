@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, MutableRefObject } from "react";
+import React, { useEffect, useRef, useMemo, MutableRefObject } from "react";
 import { Status, Wrapper } from "@googlemaps/react-wrapper";
 
 const style = {
@@ -21,7 +21,7 @@ const LewMap: React.FC = () => {
       zoom: 10,
     });
     new google.maps.Marker({ position, map });
-  });
+  }, [ref]);
 
   return <div ref={ref} id="LewLightsMap" style={style} />;
 }

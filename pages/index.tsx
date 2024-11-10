@@ -7,6 +7,7 @@ import Playlist from "../components/Playlist";
 import ErrorFlash from "../components/ErrorFlash";
 import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
+import Loading from "../components/Loading";
 import { queryRemoteFalcon, getRemoteFalconKey, Sequence, Show } from "../lib/remote_falcon";
 
 interface IndexProps {
@@ -15,31 +16,45 @@ interface IndexProps {
 }
 
 const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [offlineMessage, setOfflineMessage] = useState<string | null>(null);
   const [show, setShow] = useState<Show | null>(null);
   const [currentSequence, setCurrentSequence] = useState<Sequence | null>(null);
   const [nextSequence, setNextSequence] = useState<Sequence | null>(null);
   const [error, setError] = useState<string | null>(null);
   let logSetError = function(err: string) { console.error(err); setError(err); };
-  let offlineDuration = getOfflineDuration();
 
   useEffect(() => {
-    let interval = setInterval(() => {
-        if (!offlineDuration) {
+    const getShowState = () => {
+        const offlineMessage = getOfflineMessage();
+        setOfflineMessage(offlineMessage);
+        if (offlineMessage) {
+            setShow(null);
+            setCurrentSequence(null);
+            setNextSequence(null);
+        } else {
             queryRemoteFalcon(remoteFalconKey).then((show) => {
                 for (const seq of show.sequences) {
                     if (seq.name === show.playingNow || seq.displayName === show.playingNow) {
                         setCurrentSequence(seq);
                     }
                     if (seq.name === show.playingNext || seq.displayName === show.playingNext) {
-                        setNextSequence(seq);
+                        if (currentSequence && currentSequence.name === seq.name) {
+                            setNextSequence(null);
+                        } else {
+                            setNextSequence(seq);
+                        }
                     }
                 }
                 return setShow(show);
             }).catch(logSetError);
         }
-    }, 1500);
+        setLoading(false);
+    };
+    getShowState();
+    let interval = setInterval(getShowState, 1500);
     return () => clearInterval(interval);
-  }, [remoteFalconKey, offlineDuration]);
+  }, [remoteFalconKey]);
 
   return (
     <div className="text-gray-300 text-center">
@@ -67,8 +82,9 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
       </div>
       <div id="status" className="my-8">
         <h2 className="underline my-4">Show Status</h2>
-        { offlineDuration && <OfflineStatus duration={offlineDuration} /> }
         { error && <ErrorFlash /> }
+        { loading  && <Loading /> }
+        { offlineMessage && <OfflineStatus message={offlineMessage} /> }
         { currentSequence && <PlayingNow sequence={ currentSequence } /> }
         { nextSequence && <PlayingNext sequence={ nextSequence } /> }
         { show && <Playlist sequences={ show.sequences } /> }
@@ -99,28 +115,28 @@ function getGoogleMapsKey(): string {
   return process.env.GOOGLEMAPS_API_KEY || 'example-google-maps-token';
 }
 
-
-
-function getOfflineDuration(): string | null {
+function getOfflineMessage(): string | null {
   let now = new Date(Date.now());
   let month = now.getMonth() + 1;
   let day = now.getDate();
   // February to September
   if (month > 1 && month < 10) {
-    return 'season';
+    return "The show is offline until holiday season. See you then!";
   }
-  // October 1-27
-  if (month == 10 && day < 28) {
-    return 'season';
+  // October 1-21
+  if (month == 10 && day < 22) {
+    return "We're offline until Halloween week. See you soon!";
   }
   // January 5-31
   if (month == 1 && day > 4) {
-    return 'season';
+    return "The show is over for this season. See you next season!";
   }
   let currentHour = parseInt(now.toLocaleString('en-US', {hour: '2-digit',   hour12: false, timeZone: 'America/Chicago' }));
-  // 5pm to 10pm
-  if (currentHour < 17 || currentHour > 21) {
-    return 'evening';
+  if (currentHour >= 4 && currentHour < 17) {
+      return "The show is offline during the day. Check back when it gets dark!";
+  }
+  if (currentHour < 4 || currentHour > 21) {
+    return "The show's over for tonight. Come see us another night!";
   }
   return null;
 }
