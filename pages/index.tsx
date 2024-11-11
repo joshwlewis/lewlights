@@ -9,72 +9,83 @@ import ErrorFlash from "../components/ErrorFlash";
 import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
 import Loading from "../components/Loading";
-import { queryRemoteFalcon, getRemoteFalconKey, Sequence, Show } from "../lib/remote_falcon";
+import { queryRemoteFalcon, getRemoteFalconKey, Sequence } from "../lib/remote_falcon";
 
 interface IndexProps {
   remoteFalconKey: string,
   googleMapsKey: string,
 }
 
+interface Sequences {
+    [key: string]: Sequence
+}
+
 const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [online, setOnline] = useState<boolean>(false);
   const [offlineMessage, setOfflineMessage] = useState<string | null>(null);
-  const [show, setShow] = useState<Show | null>(null);
-  const [currentSequence, setCurrentSequence] = useState<Sequence | null>(null);
+  const [sequences, setSequences] = useState<Sequences>({});
+  const [nowPlaying, setNowPlaying] = useState<string | null>(null);
+  const [nextPlaying, setNextPlaying] = useState<string | null>(null);
+  const [nowSequence, setNowSequence] = useState<Sequence | null>(null);
   const [nextSequence, setNextSequence] = useState<Sequence | null>(null);
   const [error, setError] = useState<string | null>(null);
   let logSetError = function(err: string) { console.error(err); setError(err); };
 
   useEffect(() => {
-    const getShowState = () => {
+    const updateShowState = () => {
         const offlineMessage = getOfflineMessage();
         setOfflineMessage(offlineMessage);
-        if (offlineMessage) {
-            setShow(null);
-            setCurrentSequence(null);
-            setNextSequence(null);
-        } else {
-            queryRemoteFalcon(remoteFalconKey).then((show) => {
+        if (online || !offlineMessage) {
+            queryRemoteFalcon(remoteFalconKey)
+            .then((show) => {
+                setNowPlaying(show.playingNow);
+                setNextPlaying(show.playingNext);
                 for (const seq of show.sequences) {
-                    if (seq.name === show.playingNow || seq.displayName === show.playingNow) {
-                        setCurrentSequence(seq);
-                    }
-                    if (seq.name === show.playingNext || seq.displayName === show.playingNext) {
-                        if (currentSequence && currentSequence.name === seq.name) {
-                            setNextSequence(null);
-                        } else {
-                            setNextSequence(seq);
-                        }
-                    }
+                    setSequences((seqs) => {
+                        return { ...seqs,  [seq.name]: seq };
+                    });
                 }
-                return setShow(show);
-            }).catch(logSetError);
+            })
+            .catch(logSetError)
+            .finally(() => setLoading(false));
         }
-        setLoading(false);
     };
-    getShowState();
-    let interval = setInterval(getShowState, 1500);
+    updateShowState();
+    let interval = setInterval(updateShowState, 1500);
     return () => clearInterval(interval);
-  }, [currentSequence, remoteFalconKey]);
+  }, [remoteFalconKey, online]);
+
+  useEffect(() => {
+    Object.values(sequences).forEach((seq: Sequence) => {
+        if (seq.name === nowPlaying || seq.displayName === nowPlaying) {
+            setNowSequence(seq);
+        }
+        if (seq.name === nextPlaying || seq.displayName === nextPlaying) {
+            setNextSequence(seq);
+        }
+    });
+  }, [sequences, nowPlaying, nextPlaying])
 
   function showStatus() {
-      if (offlineMessage) {
-          return <OfflineStatus message={offlineMessage} />;
+      if (!online && offlineMessage) {
+          return <OfflineStatus key={ "offline" } message={offlineMessage} />;
       }
       let comps = [];
-      if (currentSequence) {
-        comps.push(<PlayingNow sequence={currentSequence} />);
+      if (nowSequence) {
+        comps.push(<PlayingNow key={ "PlayingNow" } sequence={nowSequence} />);
       } else {
-        comps.push(<NothingPlaying />);
+        comps.push(<NothingPlaying key={ "NothingPlaying" } />);
       }
-      if (nextSequence && (!currentSequence || nextSequence.name !== currentSequence.name)) {
-          comps.push(<PlayingNext sequence={nextSequence} />);
+      if (nextSequence && (!nowSequence || nextSequence.name !== nowSequence.name)) {
+          comps.push(<PlayingNext key={ "PlayingNext" } sequence={nextSequence} />);
       }
-      if (show && show.sequences.length >0) {
-          comps.push(<Playlist remoteFalconKey={remoteFalconKey} sequences={show.sequences} />);
+      if (Object.keys(sequences).length > 0) {
+          comps.push(<Playlist key={ "Playlist" } remoteFalconKey={remoteFalconKey} sequences={ Object.values(sequences) } />);
       }
       return comps;
   }
+
   return (
     <div className="text-gray-300 text-center">
       <div className="flex justify-center my-4">
@@ -100,7 +111,7 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
         </p>
       </div>
       <div id="status" className="my-8">
-        <h2 className="underline my-4">Show Status</h2>
+        <h2 onClick={() => setOnline(true) } className="underline my-4">Show Status</h2>
         { loading  && <Loading /> }
         { error && <ErrorFlash /> }
         { showStatus() }
