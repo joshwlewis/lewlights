@@ -9,7 +9,8 @@ const Playinglist = ({ sequences, remoteFalconKey }: Props) => {
   function enqueueSequence(sequence: Sequence) {
       return enqueueRemoteFalcon(remoteFalconKey, sequence)
   }
-  const entries = sequences.map((seq) => {
+  const visibleSequences = sequences.filter((seq) => seq.visible);
+  const entries = visibleSequences.map((seq) => {
       return <li className="text-left my-2 w-fit" key={ seq.name }>
         <button className="bg-green-500 hover:bg-green-700 font-bold p-1 rounded" onClick={() => enqueueSequence(seq)} >
               ▶ Play

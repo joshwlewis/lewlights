@@ -49,6 +49,8 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
             })
             .catch(logSetError)
             .finally(() => setLoading(false));
+        } else {
+          setLoading(false);
         }
     };
     updateShowState();
