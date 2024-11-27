@@ -182,13 +182,16 @@ function getOfflineMessage(): string | null {
   }
   // January 5-31
   if (month == 1 && day > 4) {
-    return "The show is over for this season. See you next season!";
+    return "The show is over for the holiday season. See you next season!";
   }
-  let currentHour = parseInt(now.toLocaleString('en-US', {hour: '2-digit',   hour12: false, timeZone: 'America/Chicago' }));
-  if (currentHour >= 4 && currentHour < 17) {
+  let hour = parseInt(now.toLocaleString('en-US', {hour: '2-digit', hour12: false, timeZone: 'America/Chicago' }));
+  let minute = now.getMinutes();
+  // Daytime 4:00am - 4:29pm
+  if (hour >= 4 && (hour < 16 || (hour === 16 && minute < 30))) {
     return "The show is offline during the day. Check back when it gets dark!";
   }
-  if (currentHour < 4 || currentHour > 21) {
+  // After-hours 10:00pm - 3:59am
+  if (hour < 4 || hour > 21) {
     return "The show's over for tonight. Come see us another night!";
   }
   return null;
