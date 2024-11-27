@@ -19,13 +19,20 @@ const Playinglist = ({ addToast, sequences, remoteFalconKey }: Props) => {
   const visibleSequences = sequences.filter((seq) => seq.visible);
   const entries = visibleSequences.map((seq) => {
       return <li className="text-left my-2 w-fit" key={ seq.name }>
-        <button className="bg-green-500 hover:bg-green-700 font-bold p-1 rounded" onClick={() => enqueueSequence(seq)} >
-              ▶ Play
-            </button>
-            <span className="mx-2 text-gradient">
-              { seq.displayName }
-            </span>
-        </li>
+        <div className="grid grid-rows-2 grid-flow-col gap-x-4 items-center">
+            <div className="row-span-2">
+                <button className="text-lg bg-green-500 hover:bg-green-700 font-bold p-2 rounded" onClick={() => enqueueSequence(seq)} >
+                    ▶ Play
+                </button>
+            </div>
+            <div className="col-span-5 text-lg text-gradient truncate">
+                { seq.displayName }
+            </div>
+            <div className="col-span-5 text-sm text-gradient-reverse">
+                { seq.artist }
+            </div>
+        </div>
+    </li>
 });
   return (
     <>

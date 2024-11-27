@@ -13,7 +13,7 @@ const PlayingNow = ({ sequence }: Props) => {
       <h2 className="text-xl text-gradient">
         { sequence.displayName || sequence.name }
       </h2>
-      <h3 className="text-l text-gradient">
+      <h3 className="text-l text-gradient-reverse">
         { sequence.artist }
       </h3>
     </>

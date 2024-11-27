@@ -55,6 +55,22 @@
   background-clip: text;
 }
 
+.text-gradient-reverse {
+  background: linear-gradient(120deg,
+    #D946EF,
+    #F43F5E,
+    #F97316,
+    #EAB308,
+    #22C55E,
+    #14B8A6,
+    #0EA5E9,
+    #6366F1,
+    #A855F7
+  );
+  color: transparent;
+  background-clip: text;
+}
+
 .backlit {
   box-shadow:
     0px 8px 12px -4px rgba(255,255,255,.2),
