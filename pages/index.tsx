@@ -1,23 +1,25 @@
 import type { GetStaticProps } from "next";
-import { useState, useEffect } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import OfflineStatus from "../components/OfflineStatus";
 import PlayingNow from "../components/PlayingNow";
 import NothingPlaying from "../components/NothingPlaying";
 import PlayingNext from "../components/PlayingNext";
 import Playlist from "../components/Playlist";
+import Toasts from "../components/Toasts";
 import ErrorFlash from "../components/ErrorFlash";
 import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
 import Loading from "../components/Loading";
+import { ToastMessage, ToastLevel } from "../lib/toast_message"
 import { queryRemoteFalcon, getRemoteFalconKey, Sequence } from "../lib/remote_falcon";
 
 interface IndexProps {
   remoteFalconKey: string,
-  googleMapsKey: string,
+    googleMapsKey: string,
 }
 
 interface Sequences {
-    [key: string]: Sequence
+  [key: string]: Sequence
 }
 
 const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
@@ -30,66 +32,88 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   const [nowSequence, setNowSequence] = useState<Sequence | null>(null);
   const [nextSequence, setNextSequence] = useState<Sequence | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [ticks, setTicks ] = useState<number>(0);
+
+  const addToast = useCallback((message: string, level: ToastLevel = 'info') => {
+    setToasts((toasts) => {
+      const toast: ToastMessage = { message, level, expire: ticks + 4};
+      return [...toasts, toast];
+    });
+  }, [setToasts, ticks]);
+
+  // Keep something ticking every so often.
+  useEffect(() => {
+    const to = setTimeout(() => setTicks(ticks + 1), 1500);
+    return () => clearTimeout(to);
+  }, [ticks]);
+
+  // Remove toasts once they expire
+  useEffect(() => {
+    setToasts((toasts) => {
+      return toasts.filter((toast) => {
+        return ticks < toast.expire;
+      }).slice(0)
+    });
+  }, [setToasts, ticks]);
+
   let logSetError = function(err: string) { console.error(err); setError(err); };
 
+  // Reload show data every tick
   useEffect(() => {
-    const updateShowState = () => {
-        const offlineMessage = getOfflineMessage();
-        setOfflineMessage(offlineMessage);
-        if (online || !offlineMessage) {
-            queryRemoteFalcon(remoteFalconKey)
-            .then((show) => {
-                setNowPlaying(show.playingNow);
-                setNextPlaying(show.playingNext);
-                for (const seq of show.sequences) {
-                    setSequences((seqs) => {
-                        return { ...seqs,  [seq.name]: seq };
-                    });
-                }
-            })
-            .catch(logSetError)
-            .finally(() => setLoading(false));
-        } else {
-          setLoading(false);
-        }
+    const offlineMessage = getOfflineMessage();
+    setOfflineMessage(offlineMessage);
+    if (online || !offlineMessage) {
+      queryRemoteFalcon(remoteFalconKey)
+        .then((show) => {
+          setNowPlaying(show.playingNow);
+          setNextPlaying(show.playingNext);
+          for (const seq of show.sequences) {
+            setSequences((seqs) => {
+              return { ...seqs,  [seq.name]: seq };
+            });
+          }
+        })
+        .catch(logSetError)
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     };
-    updateShowState();
-    let interval = setInterval(updateShowState, 1500);
-    return () => clearInterval(interval);
-  }, [remoteFalconKey, online]);
+  }, [remoteFalconKey, online, ticks]);
 
   useEffect(() => {
     Object.values(sequences).forEach((seq: Sequence) => {
-        if (seq.name === nowPlaying || seq.displayName === nowPlaying) {
-            setNowSequence(seq);
-        }
-        if (seq.name === nextPlaying || seq.displayName === nextPlaying) {
-            setNextSequence(seq);
-        }
+      if (seq.name === nowPlaying || seq.displayName === nowPlaying) {
+        setNowSequence(seq);
+      }
+      if (seq.name === nextPlaying || seq.displayName === nextPlaying) {
+        setNextSequence(seq);
+      }
     });
   }, [sequences, nowPlaying, nextPlaying])
 
   function showStatus() {
-      if (!online && offlineMessage) {
-          return <OfflineStatus key={ "offline" } message={offlineMessage} />;
-      }
-      let comps = [];
-      if (nowSequence) {
-        comps.push(<PlayingNow key={ "PlayingNow" } sequence={nowSequence} />);
-      } else {
-        comps.push(<NothingPlaying key={ "NothingPlaying" } />);
-      }
-      if (nextSequence && (!nowSequence || nextSequence.name !== nowSequence.name)) {
-          comps.push(<PlayingNext key={ "PlayingNext" } sequence={nextSequence} />);
-      }
-      if (Object.keys(sequences).length > 0) {
-          comps.push(<Playlist key={ "Playlist" } remoteFalconKey={remoteFalconKey} sequences={ Object.values(sequences) } />);
-      }
-      return comps;
+    if (!online && offlineMessage) {
+      return <OfflineStatus key={ "offline" } message={offlineMessage} />;
+    }
+    let comps = [];
+    if (nowSequence) {
+      comps.push(<PlayingNow key={ "PlayingNow" } sequence={nowSequence} />);
+    } else {
+      comps.push(<NothingPlaying key={ "NothingPlaying" } />);
+    }
+    if (nextSequence && (!nowSequence || nextSequence.name !== nowSequence.name)) {
+      comps.push(<PlayingNext key={ "PlayingNext" } sequence={nextSequence} />);
+    }
+    if (Object.keys(sequences).length > 0) {
+      comps.push(<Playlist key={ "Playlist" } remoteFalconKey={remoteFalconKey} sequences={ Object.values(sequences) } addToast={ addToast } />);
+    }
+    return comps;
   }
 
   return (
     <div className="text-gray-300 text-center">
+      <Toasts toasts={ toasts } />
       <div className="flex justify-center my-4">
         <div className="w-3/4 md:w-2/3">
           <video autoPlay loop muted className=''>
@@ -109,34 +133,34 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
         <p>
           Please turn off your headlights and avoid blocking any driveways.
           Tune in via <b>FM 90.5 </b> to enjoy from your vehicle.
-          And remember: <span className="text-red-600">DO NOT PRESS THE BUTTON!</span> &#x1F609;
-        </p>
-      </div>
-      <div id="status" className="my-8">
-        <h2 onClick={() => setOnline(true) } className="underline my-4">Show Status</h2>
-        { loading  && <Loading /> }
-        { error && <ErrorFlash /> }
-        { showStatus() }
-        <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
-      </div>
-      <div id="donate" className="my-8">
-        <h2 className="underline my-4">Support our Show</h2>
-        <p>
-          In lieu of direct support, consider donating to the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://supportlakelandschools.org/">Lakeland Education Foundation</a> by voting for &quot;LewLights&quot; in the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://lakelandchristmaslights.bubbleapps.io/">Lakeland Festival of Lights</a>.
-        </p>
-        <div className="my-6">
-          <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5WBELQ5LFXXTQ" className="px-4 py-3 text-blue-100 no-underline bg-blue-500 rounded hover:bg-blue-600 hover:underline hover:text-blue-200">Vote for LewLights</a>
-        </div>
-      </div>
-      <div id="map" className="my-8">
-        <h2 className="underline my-4">Our Location and Map</h2>
-        <ShowMap googleMapsApiKey={ googleMapsKey }/>
-      </div>
-      <div id="videos" className="my-8">
-        <h2 className="underline my-4">Our Present and Past Videos</h2>
-        <Videos />
-      </div>
+    And remember: <span className="text-red-600">DO NOT PRESS THE BUTTON!</span> &#x1F609;
+  </p>
+</div>
+<div id="status" className="my-8">
+  <h2 onClick={() => setOnline(true) } className="underline my-4">Show Status</h2>
+    { loading  && <Loading /> }
+    { error && <ErrorFlash /> }
+    { showStatus() }
+    <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
+  </div>
+  <div id="donate" className="my-8">
+    <h2 className="underline my-4">Support our Show</h2>
+    <p>
+      In lieu of direct support, consider donating to the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://supportlakelandschools.org/">Lakeland Education Foundation</a> by voting for &quot;LewLights&quot; in the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://lakelandchristmaslights.bubbleapps.io/">Lakeland Festival of Lights</a>.
+    </p>
+    <div className="my-6">
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5WBELQ5LFXXTQ" className="px-4 py-3 text-blue-100 no-underline bg-blue-500 rounded hover:bg-blue-600 hover:underline hover:text-blue-200">Vote for LewLights</a>
     </div>
+  </div>
+  <div id="map" className="my-8">
+    <h2 className="underline my-4">Our Location and Map</h2>
+    <ShowMap googleMapsApiKey={ googleMapsKey }/>
+  </div>
+  <div id="videos" className="my-8">
+    <h2 className="underline my-4">Our Present and Past Videos</h2>
+    <Videos />
+  </div>
+</div>
     );
 };
 
@@ -162,7 +186,7 @@ function getOfflineMessage(): string | null {
   }
   let currentHour = parseInt(now.toLocaleString('en-US', {hour: '2-digit',   hour12: false, timeZone: 'America/Chicago' }));
   if (currentHour >= 4 && currentHour < 17) {
-      return "The show is offline during the day. Check back when it gets dark!";
+    return "The show is offline during the day. Check back when it gets dark!";
   }
   if (currentHour < 4 || currentHour > 21) {
     return "The show's over for tonight. Come see us another night!";
@@ -170,7 +194,7 @@ function getOfflineMessage(): string | null {
   return null;
 }
 
-export const getServerSideProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetStaticProps = async (_context) => {
   return { props: { googleMapsKey: getGoogleMapsKey(), remoteFalconKey: getRemoteFalconKey() } };
 }
 
