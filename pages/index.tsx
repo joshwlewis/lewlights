@@ -1,5 +1,6 @@
 import type { GetStaticProps } from "next";
 import { useCallback, useState, useEffect } from 'react'
+import SunCalc from 'suncalc';
 import OfflineStatus from "../components/OfflineStatus";
 import PlayingNow from "../components/PlayingNow";
 import NothingPlaying from "../components/NothingPlaying";
@@ -185,9 +186,11 @@ function getOfflineMessage(): string | null {
     return "The show is over for the holiday season. See you next season!";
   }
   let hour = parseInt(now.toLocaleString('en-US', {hour: '2-digit', hour12: false, timeZone: 'America/Chicago' }));
-  let minute = now.getMinutes();
-  // Daytime 4:00am - 4:29pm
-  if (hour >= 4 && (hour < 16 || (hour === 16 && minute < 30))) {
+  // Show status is available 45 minutes prior to sunset.
+  let showtime = SunCalc.getTimes(new Date(), 35.2533, -89.7133).sunset;
+  showtime.setMinutes(showtime.getMinutes() - 45);
+  // Daytime 4:00am - 45 minutes before sunset
+  if (hour >= 4 && now < showtime) {
     return "The show is offline during the day. Check back when it gets dark!";
   }
   // After-hours 10:00pm - 3:59am
