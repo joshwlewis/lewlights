@@ -11,6 +11,7 @@ import ErrorFlash from "../components/ErrorFlash";
 import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
 import Loading from "../components/Loading";
+import Donate from "../components/Donate";
 import { ToastMessage, ToastLevel } from "../lib/toast_message"
 import { queryRemoteFalcon, getRemoteFalconKey, Sequence } from "../lib/remote_falcon";
 
@@ -146,12 +147,7 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   </div>
   <div id="donate" className="my-8">
     <h2 className="underline my-4">Support our Show</h2>
-    <p>
-      In lieu of direct support, consider donating to the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://supportlakelandschools.org/">Lakeland Education Foundation</a> by voting for &quot;LewLights&quot; in the <a className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://lakelandchristmaslights.bubbleapps.io/">Lakeland Festival of Lights</a>.
-    </p>
-    <div className="my-6">
-      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5WBELQ5LFXXTQ" className="px-4 py-3 text-blue-100 no-underline bg-blue-500 rounded hover:bg-blue-600 hover:underline hover:text-blue-200">Vote for LewLights</a>
-    </div>
+    <Donate />
   </div>
   <div id="map" className="my-8">
     <h2 className="underline my-4">Our Location and Map</h2>
