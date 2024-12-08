@@ -116,7 +116,7 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   return (
     <div className="text-gray-300 text-center">
       <Toasts toasts={ toasts } />
-      <div className="flex justify-center my-4">
+      <div id="home" className="flex justify-center my-4">
         <div className="w-3/4 md:w-2/3">
           <video autoPlay loop muted className=''>
             <source
@@ -127,7 +127,6 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
         </div>
       </div>
       <div id="about" className="my-8">
-        <h2 className="underline my-4">About</h2>
         <p className="my-4">
           LewLights is a holiday light show by the Lewis family in Lakeland, TN.
           We would love to have you stop for a bit to watch and listen.

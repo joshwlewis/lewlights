@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 const pages: Record<string, string> = {
-  "#about": 'about',
+  "#home": 'home',
   "#status": "status",
   "#donate": 'donate',
   "#map": 'map',
