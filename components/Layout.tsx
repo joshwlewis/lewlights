@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const pages: Record<string, string> = {
   "#home": 'home',
-  "#status": "status",
+  "#jukebox": "jukebox",
   "#donate": 'donate',
   "#map": 'map',
   "#videos": 'videos'

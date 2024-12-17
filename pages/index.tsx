@@ -1,6 +1,5 @@
 import type { GetStaticProps } from "next";
 import { useCallback, useState, useEffect } from 'react'
-import SunCalc from 'suncalc';
 import OfflineStatus from "../components/OfflineStatus";
 import PlayingNow from "../components/PlayingNow";
 import NothingPlaying from "../components/NothingPlaying";
@@ -12,6 +11,7 @@ import ShowMap from "../components/ShowMap";
 import Videos from "../components/Videos";
 import Loading from "../components/Loading";
 import Donate from "../components/Donate";
+import { OfflineReason, getOfflineReason } from "../lib/showtime";
 import { ToastMessage, ToastLevel } from "../lib/toast_message"
 import { queryRemoteFalcon, getRemoteFalconKey, Sequence } from "../lib/remote_falcon";
 
@@ -27,7 +27,7 @@ interface Sequences {
 const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [online, setOnline] = useState<boolean>(false);
-  const [offlineMessage, setOfflineMessage] = useState<string | null>(null);
+  const [offlineReason, setOfflineReason] = useState<OfflineReason>(null);
   const [sequences, setSequences] = useState<Sequences>({});
   const [nowPlaying, setNowPlaying] = useState<string | null>(null);
   const [nextPlaying, setNextPlaying] = useState<string | null>(null);
@@ -63,9 +63,9 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
 
   // Reload show data every tick
   useEffect(() => {
-    const offlineMessage = getOfflineMessage();
-    setOfflineMessage(offlineMessage);
-    if (online || !offlineMessage) {
+    const offlineReason = getOfflineReason();
+    setOfflineReason(offlineReason);
+    if (online || !offlineReason) {
       queryRemoteFalcon(remoteFalconKey)
         .then((show) => {
           setNowPlaying(show.playingNow);
@@ -95,8 +95,8 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   }, [sequences, nowPlaying, nextPlaying])
 
   function showStatus() {
-    if (!online && offlineMessage) {
-      return <OfflineStatus key={ "offline" } message={offlineMessage} />;
+    if (!online && offlineReason) {
+      return <OfflineStatus key={ "offline" } reason={offlineReason} />;
     }
     let comps = [];
     if (nowSequence) {
@@ -134,22 +134,22 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
             And remember: <span className="text-red-600">DO NOT PRESS THE BUTTON!</span> &#x1F609;
         </p>
 </div>
-<div id="status" className="my-8">
-  <h2 onClick={() => setOnline(true) } className="underline my-4">Show Status</h2>
+<div id="jukebox" className="my-8">
+  <h2 onClick={() => setOnline(true) } className="underline text-xl my-4">Jukebox</h2>
     { loading  && <Loading /> }
     { error && <ErrorFlash /> }
     { showStatus() }
   </div>
   <div id="donate" className="my-8">
-    <h2 className="underline my-4">Support our Show / Donate</h2>
+    <h2 className="underline text-xl my-4">Support</h2>
     <Donate />
   </div>
   <div id="map" className="my-8">
-    <h2 className="underline my-4">Our Location and Map</h2>
+    <h2 className="underline text-xl my-4">Location</h2>
     <ShowMap googleMapsApiKey={ googleMapsKey }/>
   </div>
   <div id="videos" className="my-8">
-    <h2 className="underline my-4">Our Present and Past Videos</h2>
+    <h2 className="underline text-xl my-4">Videos</h2>
     <Videos />
   </div>
 </div>
@@ -158,37 +158,6 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
 
 function getGoogleMapsKey(): string {
   return process.env.GOOGLEMAPS_API_KEY || 'example-google-maps-token';
-}
-
-function getOfflineMessage(): string | null {
-  let now = new Date(Date.now());
-  let month = now.getMonth() + 1;
-  let day = now.getDate();
-  // February to September
-  if (month > 1 && month < 10) {
-    return "The show is offline until holiday season. See you then!";
-  }
-  // October 1-21
-  if (month == 10 && day < 22) {
-    return "We're offline until Halloween week. See you soon!";
-  }
-  // January 5-31
-  if (month == 1 && day > 4) {
-    return "The show is over for the holiday season. See you next season!";
-  }
-  let hour = parseInt(now.toLocaleString('en-US', {hour: '2-digit', hour12: false, timeZone: 'America/Chicago' }));
-  // Show status is available 45 minutes prior to sunset.
-  let showtime = SunCalc.getTimes(new Date(), 35.2533, -89.7133).sunset;
-  showtime.setMinutes(showtime.getMinutes() - 45);
-  // Daytime 4:00am - 45 minutes before sunset
-  if (hour >= 4 && now < showtime) {
-    return "The show is offline during the day. Check back when it gets dark!";
-  }
-  // After-hours 10:00pm - 3:59am
-  if (hour < 4 || hour > 21) {
-    return "The show's over for tonight. Come see us another night!";
-  }
-  return null;
 }
 
 export const getServerSideProps: GetStaticProps = async (_context) => {

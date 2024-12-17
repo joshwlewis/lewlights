@@ -1,13 +1,21 @@
+import { OfflineReason, getOfflineMessage, getShowtime } from "../lib/showtime";
+
 interface Props {
-  message: string
+  reason: OfflineReason
 }
 
-const OfflineStatus = ({ message }: Props) => {
+const OfflineStatus = ({ reason }: Props) => {
+  const message = getOfflineMessage(reason);
+  const showtime = new Intl.DateTimeFormat('en-US', { dateStyle: "long", timeStyle: "long" }).format(getShowtime(reason))
   return (
     <>
-      <h2 className="text-xl mb-2">
+      <h3 className="mb-2">
         { message }
-      </h2>
+      </h3>
+      <p>
+          The next showtime is at approximately&nbsp;
+          <b className="text-gradient">{ showtime }</b>.
+      </p>
     </>
   );
 }
