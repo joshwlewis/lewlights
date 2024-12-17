@@ -145,7 +145,7 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
     <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
   </div>
   <div id="donate" className="my-8">
-    <h2 className="underline my-4">Support our Show</h2>
+    <h2 className="underline my-4">Support our Show / Donate</h2>
     <Donate />
   </div>
   <div id="map" className="my-8">
