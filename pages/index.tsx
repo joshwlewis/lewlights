@@ -128,21 +128,17 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
       </div>
       <div id="about" className="my-8">
         <p className="my-4">
-          LewLights is a holiday light show by the Lewis family in Lakeland, TN.
-          We would love to have you stop for a bit to watch and listen.
+            LewLights is a holiday light show by the Lewis family on Mount McKenzie Road in Lakeland, TN.
+            The show typically runs from sunset to 9pm Central, from Halloween to New Years Day.
+            Tune in via <b>FM 90.5</b> to enjoy from your vehicle.
+            And remember: <span className="text-red-600">DO NOT PRESS THE BUTTON!</span> &#x1F609;
         </p>
-        <p>
-          Please turn off your headlights and avoid blocking any driveways.
-          Tune in via <b>FM 90.5 </b> to enjoy from your vehicle.
-    And remember: <span className="text-red-600">DO NOT PRESS THE BUTTON!</span> &#x1F609;
-  </p>
 </div>
 <div id="status" className="my-8">
   <h2 onClick={() => setOnline(true) } className="underline my-4">Show Status</h2>
     { loading  && <Loading /> }
     { error && <ErrorFlash /> }
     { showStatus() }
-    <p>The show typically runs from Sunset to 9pm CST, from Halloween to New Years Day.</p>
   </div>
   <div id="donate" className="my-8">
     <h2 className="underline my-4">Support our Show / Donate</h2>
