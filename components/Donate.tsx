@@ -14,7 +14,7 @@ const Donate = () => {
       <div className="my-4 grid grid-cols-5 gap-4 items-center">
         <div className="col-span-3">
           <p><b>Step 1:</b></p>
-          <div>Use the form to vote for your favorite lights and enter your info</div>
+          <div>Use this form to vote for your favorite.</div>
         </div>
         <div className="col-span-2">
           <a className="w-full inline-block p-4 rounded bg-blue-500 hover:bg-blue-700 hover:underline" href="https://dmcgarry.typeform.com/to/ch7BVOGe" target="_blank" rel="noopener noreferrer">
@@ -23,7 +23,7 @@ const Donate = () => {
         </div>
         <div className="col-span-3">
           <p><b>Step 2:</b></p>
-          <p>Donate as much as you&apos;d like to Lakeland Schools (each $1 donated is 1 vote)</p>
+          <p>Donate as much as you&apos;d like to Lakeland Schools (each $1 donated is 1 vote).</p>
         </div>
         <div className="col-span-2">
           <a className="w-full inline-block p-4 rounded bg-blue-500 hover:bg-blue-700 hover:underline" href="https://www.paypal.com/ncp/payment/9X9G2F37YRUF2" target="_blank" rel="noopener noreferrer">
