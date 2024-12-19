@@ -131,21 +131,21 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
         </p>
 </div>
 <div id="jukebox" className="my-8">
-  <h2 onClick={() => setOnline(true) } className="underline text-xl my-4">Jukebox</h2>
+  <h2 onClick={() => setOnline(true) } className="font-bold text-xl my-4">Jukebox</h2>
     { loading  && <Loading /> }
     { error && <ErrorFlash /> }
     { jukebox() }
   </div>
   <div id="donate" className="my-8">
-    <h2 className="underline text-xl my-4">Support</h2>
+    <h2 className="font-bold text-xl my-4">Support</h2>
     <Donate />
   </div>
   <div id="map" className="my-8">
-    <h2 className="underline text-xl my-4">Location</h2>
+    <h2 className="font-bold text-xl my-4">Location</h2>
     <ShowMap googleMapsApiKey={ googleMapsKey }/>
   </div>
   <div id="videos" className="my-8">
-    <h2 className="underline text-xl my-4">Videos</h2>
+    <h2 className="font-bold text-xl my-4">Videos</h2>
     <Videos />
   </div>
 </div>

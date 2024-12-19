@@ -13,9 +13,9 @@ const OfflineStatus = ({ reason }: Props) => {
         { message }
       </h3>
       <p>
-          The next showtime is at approximately&nbsp;
-          <b className="text-gradient">{ showtime }</b>.
+        Next Showtime:
       </p>
+        <h4 className="text-gradient">{ showtime }</h4>
     </>
   );
 }
