@@ -1,10 +1,7 @@
 import type { GetStaticProps } from "next";
 import { useCallback, useState, useEffect } from 'react'
 import OfflineStatus from "../components/OfflineStatus";
-import PlayingNow from "../components/PlayingNow";
-import NothingPlaying from "../components/NothingPlaying";
-import PlayingNext from "../components/PlayingNext";
-import Playlist from "../components/Playlist";
+import Jukebox from "../components/Jukebox";
 import Toasts from "../components/Toasts";
 import ErrorFlash from "../components/ErrorFlash";
 import ShowMap from "../components/ShowMap";
@@ -84,33 +81,32 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   }, [remoteFalconKey, online, ticks]);
 
   useEffect(() => {
+    let nowSeq: Sequence | null = null;
+    let nextSeq: Sequence | null = null;
     Object.values(sequences).forEach((seq: Sequence) => {
       if (seq.name === nowPlaying || seq.displayName === nowPlaying) {
-        setNowSequence(seq);
+        nowSeq = seq;
       }
       if (seq.name === nextPlaying || seq.displayName === nextPlaying) {
-        setNextSequence(seq);
+        nextSeq = seq;
       }
     });
+    // Null out next sequence if it's the same as the last (don't show twice).
+    if (nowSeq && nextSeq == nowSeq) {
+        nextSeq = null;
+    }
+    if (!nowSeq && nowPlaying) {
+        nowSeq = { name: nowPlaying, displayName: null, artist: "???", imageUrl: null, visible: false }
+    }
+    setNowSequence(nowSeq);
+    setNextSequence(nextSeq);
   }, [sequences, nowPlaying, nextPlaying])
 
-  function showStatus() {
+  function jukebox() {
     if (!online && offlineReason) {
       return <OfflineStatus key={ "offline" } reason={offlineReason} />;
     }
-    let comps = [];
-    if (nowSequence) {
-      comps.push(<PlayingNow key={ "PlayingNow" } sequence={nowSequence} />);
-    } else {
-      comps.push(<NothingPlaying key={ "NothingPlaying" } />);
-    }
-    if (nextSequence && (!nowSequence || nextSequence.name !== nowSequence.name)) {
-      comps.push(<PlayingNext key={ "PlayingNext" } sequence={nextSequence} />);
-    }
-    if (Object.keys(sequences).length > 0) {
-      comps.push(<Playlist key={ "Playlist" } remoteFalconKey={remoteFalconKey} sequences={ Object.values(sequences) } addToast={ addToast } />);
-    }
-    return comps;
+    return <Jukebox sequences={ Object.values(sequences) } nowSequence={nowSequence} nextSequence={nextSequence} addToast={addToast} remoteFalconKey={remoteFalconKey} />;
   }
 
   return (
@@ -138,7 +134,7 @@ const Index = ({googleMapsKey, remoteFalconKey}: IndexProps) => {
   <h2 onClick={() => setOnline(true) } className="underline text-xl my-4">Jukebox</h2>
     { loading  && <Loading /> }
     { error && <ErrorFlash /> }
-    { showStatus() }
+    { jukebox() }
   </div>
   <div id="donate" className="my-8">
     <h2 className="underline text-xl my-4">Support</h2>

@@ -1,19 +1,21 @@
+import { ForwardIcon } from '@heroicons/react/24/outline'
 import { Sequence } from '../lib/remote_falcon';
+import SequenceDetails from '../components/SequenceDetails';
 
 interface Props {
-  sequence: Sequence
+  sequence: Sequence,
 }
 
 const PlayingNow = ({ sequence }: Props) => {
   return (
     <>
-      <h3 className="text-l">Next Up</h3>
-      <h2 className="text-xl text-gradient">
-        { sequence.displayName || sequence.name }
-      </h2>
-      <h2 className="text-l text-gradient-reverse">
-        { sequence.artist }
-      </h2>
+        <button className="my-1 p-2 rounded-full bg-sky-500/50 hover:bg-gray-500/50 shadow-inner shadow-sky-500/50" disabled={true}>
+            <ForwardIcon className="size-5 inline-block" strokeWidth={2} />
+            <span className="hidden sm:inline"> Next</span>
+        </button>
+        <div className="col-span-4">
+            <SequenceDetails sequence={sequence}/>
+        </div>
     </>
   );
 }

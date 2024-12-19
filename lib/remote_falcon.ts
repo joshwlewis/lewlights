@@ -62,9 +62,9 @@ export async function enqueueRemoteFalcon(jwt: string, sequence: Sequence): Prom
 
 export interface Sequence {
     name: string,
-    displayName: string,
-    artist: string,
-    imageUrl: string,
+    displayName: string | null,
+    artist: string | null,
+    imageUrl: string | null,
     visible: boolean,
 }
 
