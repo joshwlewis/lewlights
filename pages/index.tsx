@@ -156,8 +156,15 @@ function getGoogleMapsKey(): string {
   return process.env.GOOGLEMAPS_API_KEY || 'example-google-maps-token';
 }
 
-export const getServerSideProps: GetStaticProps = async (_context) => {
-  return { props: { googleMapsKey: getGoogleMapsKey(), remoteFalconKey: getRemoteFalconKey() } };
+export const getStaticProps: GetStaticProps = async (_context) => {
+    return {
+        props: {
+            googleMapsKey: getGoogleMapsKey(),
+            remoteFalconKey: getRemoteFalconKey()
+        },
+        // Cache static data for 4 hours.
+        revalidate: 14400,
+    };
 }
 
 export default Index;

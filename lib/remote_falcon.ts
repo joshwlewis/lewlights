@@ -4,7 +4,7 @@ export function getRemoteFalconKey(): string {
   // const accessToken = process.env.REMOTEFALCON_ACCESS_TOKEN || 'example-remote-falcon-token';
   // const secretKey: Secret = process.env.REMOTEFALCON_SECRET_KEY || 'example-remote-falcon-show-secret';
   const secretKey: Secret = process.env.REMOTEFALCON_VIEWER_SIGN_KEY || 'example-remote-falcon-viewer-secret';
-  return sign({ iss: "remotefalcon", showSubdomain: "lewlights", expiresIn: 21600 }, secretKey);
+  return sign({ iss: "remotefalcon", showSubdomain: "lewlights", expiresIn: 28800 }, secretKey);
 }
 
 export async function queryRemoteFalcon(jwt: string): Promise<Show> {
