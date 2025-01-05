@@ -13,8 +13,8 @@ export function getOfflineReason(): OfflineReason {
   if (month == 10 && day < 25) {
     return "preseason";
   }
-  // January 5-31
-  if (month == 1 && day > 4) {
+  // January 4-31
+  if (month == 1 && day > 3) {
     return "postseason";
   }
 
